@@ -1,0 +1,35 @@
+import Button from "@/components/common/Button";
+import Container from "@/components/common/Container";
+import Reveal from "@/components/common/Reveal";
+import CourseCard from "@/components/course/CourseCard";
+import CourseSwiper from "@/components/course/CourseSwiper";
+import { COURSES } from "@/lib/site-data";
+
+export default function CoursesPreview() {
+  const featured = COURSES.slice(0, 3);
+
+  return (
+    <Container as="section" className="py-20">
+      <Reveal className="flex flex-wrap items-end justify-between gap-4">
+        <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
+          Our courses
+        </h2>
+        <Button href="/courses" variant="outline" className="text-sm">
+          View all courses
+        </Button>
+      </Reveal>
+
+      <Reveal delay={80} className="mt-8 lg:hidden">
+        <CourseSwiper courses={featured} />
+      </Reveal>
+
+      <div className="mt-8 hidden gap-6 lg:grid lg:grid-cols-3">
+        {featured.map((course, index) => (
+          <Reveal key={course.slug} delay={index * 90}>
+            <CourseCard course={course} />
+          </Reveal>
+        ))}
+      </div>
+    </Container>
+  );
+}

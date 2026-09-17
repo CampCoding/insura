@@ -1,5 +1,5 @@
-const STORAGE_KEY = "miras-enrollments";
-const EVENT_NAME = "miras-enrollment-change";
+const STORAGE_KEY = "insura-enrollments";
+const EVENT_NAME = "insura-enrollment-change";
 
 function readStore() {
   if (typeof window === "undefined") return {};

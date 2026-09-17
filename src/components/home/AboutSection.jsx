@@ -9,7 +9,7 @@ export default function AboutSection() {
           Who we are
         </h2>
         <p className="mt-4 text-base leading-7 text-muted-foreground">
-          Miras is a training platform built for physiotherapists and rehab
+          Insura is a training platform built for physiotherapists and rehab
           specialists. Every course is designed with practicing doctors,
           structured around real clinical cases, and built so you can learn at
           your own pace, then apply it the same week in clinic.

@@ -35,7 +35,7 @@ export default function RegisterPage() {
           Create an account
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Sign up to start learning with Miras.
+          Sign up to start learning with Insura.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">

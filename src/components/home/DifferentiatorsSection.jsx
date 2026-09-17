@@ -32,7 +32,7 @@ export default function DifferentiatorsSection() {
     <Container as="section" className="py-20">
       <Reveal className="mx-auto max-w-2xl text-center">
         <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
-          What makes Miras different
+          What makes Insura different
         </h2>
       </Reveal>
 

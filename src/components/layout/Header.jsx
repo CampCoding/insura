@@ -47,7 +47,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
       <Container className="flex items-center justify-between">
         <div ref={barRef} className="flex h-20 items-center gap-6">
-          <div ref={markRef}>
+          <div ref={markRef} className="shrink-0">
             <Logo imageClassName="h-12" />
           </div>
 

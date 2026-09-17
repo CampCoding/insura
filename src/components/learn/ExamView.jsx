@@ -179,7 +179,7 @@ export default function ExamView({ course }) {
       {stage === "exam" && (
         <div
           onContextMenu={(event) => event.preventDefault()}
-          className="relative flex flex-1 select-none flex-col overflow-hidden sm:flex-row"
+          className="relative isolate flex flex-1 select-none flex-col overflow-hidden sm:flex-row"
         >
           <aside className="flex shrink-0 gap-2 overflow-x-auto border-b border-border bg-surface p-3 sm:w-auto sm:flex-col sm:items-center sm:overflow-x-hidden sm:overflow-y-auto sm:border-b-0 sm:border-r">
             <div className="flex gap-2 sm:flex-col sm:items-center sm:gap-2.5">

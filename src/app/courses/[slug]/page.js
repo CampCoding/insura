@@ -31,7 +31,7 @@ export async function generateMetadata({ params }) {
   const course = COURSES.find((c) => c.slug === slug);
   if (!course) return {};
   return {
-    title: `${course.title} | Miras`,
+    title: `${course.title} | Insura`,
     description: course.description,
   };
 }

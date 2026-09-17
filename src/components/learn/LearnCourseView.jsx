@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { ClipboardList, FileText } from "lucide-react";
 import Button from "@/components/common/Button";
 import Container from "@/components/common/Container";
 import CourseCurriculum from "@/components/course/CourseCurriculum";
 import { getCourseStats, getFlatLessons, unsplashUrl } from "@/lib/site-data";
 import { useEnrollment } from "@/lib/useEnrollment";
+import { ClipboardList, FileText } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import PdfViewerModal from "./PdfViewerModal";
 
 function TabButton({ active, onClick, children }) {
@@ -84,8 +84,8 @@ export default function LearnCourseView({ course }) {
         </div>
       </div>
 
-      <div className="mt-14 grid gap-10 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+      <div className="mt-14 grid gap-10 md:grid-cols-3">
+        <div className="md:col-span-2">
           <div className="flex flex-wrap items-center gap-2">
             <TabButton
               active={activeTab === "content"}
@@ -195,7 +195,7 @@ export default function LearnCourseView({ course }) {
                 <p className="truncate text-base font-semibold text-foreground">
                   {course.instructor.name}
                 </p>
-                <p className="truncate text-sm text-muted-foreground">
+                <p className="truncate whitespace-normal! text-sm text-muted-foreground">
                   {course.instructor.title}
                 </p>
               </div>

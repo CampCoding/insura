@@ -6,7 +6,7 @@ import { Moon, Sun } from "lucide-react";
 
 function getInitialIsDark() {
   if (typeof document === "undefined") return false;
-  const stored = window.localStorage.getItem("miras-theme");
+  const stored = window.localStorage.getItem("insura-theme");
   if (stored) return stored === "dark";
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
@@ -46,7 +46,7 @@ export default function ThemeToggle({ className = "" }) {
   const toggle = () => {
     const next = !isDark;
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-    window.localStorage.setItem("miras-theme", next ? "dark" : "light");
+    window.localStorage.setItem("insura-theme", next ? "dark" : "light");
     animateSwap(next);
     setIsDark(next);
   };

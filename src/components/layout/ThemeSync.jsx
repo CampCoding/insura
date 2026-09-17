@@ -6,7 +6,7 @@ export default function ThemeSync() {
   useEffect(() => {
     let stored = null;
     try {
-      stored = window.localStorage.getItem("miras-theme");
+      stored = window.localStorage.getItem("insura-theme");
     } catch {
       return;
     }

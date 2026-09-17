@@ -20,9 +20,10 @@ const displayFont = EB_Garamond({
 });
 
 export const metadata = {
-  title: "Miras | Medical Rehabilitation Courses",
+  metadataBase: new URL("https://insura.example"), // TODO: replace with the real production domain
+  title: "Insura | Medical Rehabilitation Courses",
   description:
-    "Miras is a training platform for medical rehabilitation courses: videos, PDFs, exam banks and notes from real practicing specialists.",
+    "Insura is a training platform for medical rehabilitation courses: videos, PDFs, exam banks and notes from real practicing specialists.",
 };
 
 export default function RootLayout({ children }) {
@@ -35,7 +36,7 @@ export default function RootLayout({ children }) {
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('miras-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('insura-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`,
           }}
         />
       </head>

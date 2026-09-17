@@ -45,19 +45,27 @@
   --primary-tint: #142b3f;
 }
 
-.brand-logo {
-  transition: filter 0.2s ease;
+.logo-dark {
+  display: none;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .brand-logo {
-    filter: brightness(0) invert(1);
+  :root:not([data-theme="light"]) .logo-light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .logo-dark {
+    display: block;
   }
 }
 
-:root[data-theme="dark"] .brand-logo {
-  filter: brightness(0) invert(1);
+:root[data-theme="dark"] .logo-light {
+  display: none;
 }
+
+:root[data-theme="dark"] .logo-dark {
+  display: block;
+}
+
 
 @theme inline {
   --color-background: var(--background);

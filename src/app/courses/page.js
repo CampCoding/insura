@@ -4,8 +4,8 @@ import Reveal from "@/components/common/Reveal";
 import { COURSES } from "@/lib/site-data";
 
 export const metadata = {
-  title: "Courses | Miras",
-  description: "Browse Miras medical rehabilitation courses.",
+  title: "Courses | Insura",
+  description: "Browse Insura medical rehabilitation courses.",
 };
 
 export default function CoursesPage() {

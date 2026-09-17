@@ -44,7 +44,7 @@ export default function PdfViewerModal({ attachment, onClose }) {
 
       <div
         onContextMenu={(event) => event.preventDefault()}
-        className="relative flex-1 select-none"
+        className="relative isolate flex-1 select-none"
       >
         <iframe
           src={`${attachment.url}#toolbar=0`}

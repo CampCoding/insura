@@ -4,8 +4,8 @@ import Reveal from "@/components/common/Reveal";
 import { UPDATES } from "@/lib/site-data";
 
 export const metadata = {
-  title: "Announcements | Miras",
-  description: "Latest announcements and attachments from Miras.",
+  title: "Announcements | Insura",
+  description: "Latest announcements and attachments from Insura.",
 };
 
 const ATTACHMENT_ICON = {
@@ -21,7 +21,7 @@ export default function UpdatesPage() {
           Announcements
         </h1>
         <p className="mt-4 text-base leading-7 text-muted-foreground">
-          Announcements, posters and attachments shared by the Miras team.
+          Announcements, posters and attachments shared by the Insura team.
         </p>
       </Reveal>
 

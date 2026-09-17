@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 const CLIPBOARD_NOTICE =
-  "Screenshots of protected Miras course content are not permitted.";
+  "Screenshots of protected Insura course content are not permitted.";
 
 function overwriteClipboard() {
   const helper = document.createElement("textarea");

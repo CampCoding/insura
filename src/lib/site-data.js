@@ -1,12 +1,12 @@
 export const SITE = {
-  name: "Miras",
+  name: "Insura",
   tagline: "Medical rehabilitation training for practicing specialists",
   whatsappNumber: "201000000000", // TODO: replace with real WhatsApp number
-  email: "info@miras.example",
+  email: "info@insura.example",
   social: {
-    facebook: "https://facebook.com/miras",
-    instagram: "https://instagram.com/miras",
-    tiktok: "https://tiktok.com/@miras",
+    facebook: "https://facebook.com/insura",
+    instagram: "https://instagram.com/insura",
+    tiktok: "https://tiktok.com/@insura",
   },
 };
 

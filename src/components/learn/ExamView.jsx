@@ -149,7 +149,7 @@ export default function ExamView({ course }) {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-tint text-primary">
               <ClipboardList size={28} strokeWidth={1.75} />
             </div>
-            <h1 className="text-3xl font-semibold text-foreground">
+            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
               {course.exam.title}
             </h1>
             <p className="text-muted-foreground">
@@ -201,7 +201,7 @@ export default function ExamView({ course }) {
               <p className="text-sm font-medium text-primary">
                 Question {currentIndex + 1} of {questions.length}
               </p>
-              <h2 className="text-2xl font-semibold text-foreground">
+              <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
                 {question.question}
               </h2>
 
@@ -286,7 +286,7 @@ export default function ExamView({ course }) {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-tint text-primary">
               <Award size={28} strokeWidth={1.75} />
             </div>
-            <h2 className="text-3xl font-semibold text-foreground">
+            <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
               You scored {score}/{questions.length}
             </h2>
             <p className="text-muted-foreground">
@@ -307,7 +307,7 @@ export default function ExamView({ course }) {
                         : "border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/20"
                     }`}
                   >
-                    <span className="min-w-0 flex-1 truncate text-foreground">
+                    <span className="min-w-0 flex-1 text-foreground">
                       {i + 1}. {q.question}
                     </span>
                     {isCorrect ? (

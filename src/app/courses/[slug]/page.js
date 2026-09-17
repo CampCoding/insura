@@ -70,7 +70,7 @@ export default async function CoursePage({ params }) {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <span className="text-2xl font-semibold text-primary">
+            <span className="text-xl font-semibold text-primary sm:text-2xl">
               {course.price}
             </span>
             <CourseEnrollActions slug={course.slug} whatsappHref={whatsappHref} />
@@ -146,7 +146,7 @@ export default async function CoursePage({ params }) {
                 <Clock size={13} />
                 {course.duration}
               </span>
-              <p className="mt-4 text-2xl font-semibold text-primary">
+              <p className="mt-4 text-xl font-semibold text-primary sm:text-2xl">
                 {course.price}
               </p>
               <div className="mt-5">

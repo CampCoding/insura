@@ -21,7 +21,7 @@ export default function FormPreviewPage() {
 
   return (
     <Container as="section" className="max-w-lg py-16">
-      <h1 className="text-3xl font-semibold text-foreground">
+      <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
         Form primitives preview
       </h1>
       <div className="mt-8 flex flex-col gap-5">

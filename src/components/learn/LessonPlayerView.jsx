@@ -251,7 +251,7 @@ export default function LessonPlayerView({ course, lesson }) {
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-2xl font-semibold text-foreground">
+            <div className="flex items-center gap-2 text-xl font-semibold text-foreground sm:text-2xl">
               <MonitorPlay
                 size={22}
                 className="shrink-0 text-primary"

@@ -31,7 +31,7 @@ export default function RegisterPage() {
       <Logo className="mb-6" imageClassName="h-24" />
 
       <div className="w-full max-w-3xl rounded-card border border-border bg-surface p-8">
-        <h1 className="text-2xl font-semibold text-foreground">
+        <h1 className="text-xl font-semibold text-foreground sm:text-2xl md:text-3xl">
           Create an account
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">

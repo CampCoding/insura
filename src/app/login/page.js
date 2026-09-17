@@ -19,7 +19,7 @@ export default function LoginPage() {
       <Logo className="mb-8" imageClassName="h-24" />
 
       <div className="w-full max-w-md rounded-card border border-border bg-surface p-8">
-        <h1 className="text-2xl font-semibold text-foreground">Log in</h1>
+        <h1 className="text-xl font-semibold text-foreground sm:text-2xl">Log in</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Welcome back, log in to continue.
         </p>

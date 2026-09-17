@@ -150,7 +150,7 @@ export default function LearnCourseView({ course }) {
                       <FileText size={20} strokeWidth={1.75} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-base font-semibold text-foreground">
+                      <p className="text-base font-semibold text-foreground">
                         {attachment.title}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -191,11 +191,11 @@ export default function LearnCourseView({ course }) {
                   className="object-cover"
                 />
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="truncate text-base font-semibold text-foreground">
                   {course.instructor.name}
                 </p>
-                <p className="truncate whitespace-normal! text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {course.instructor.title}
                 </p>
               </div>

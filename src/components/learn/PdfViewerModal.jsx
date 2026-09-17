@@ -26,10 +26,14 @@ export default function PdfViewerModal({ attachment, onClose }) {
 
   if (!attachment) return null;
 
+  const viewerSrc = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(
+    attachment.url
+  )}#zoom=page-width`;
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-background">
-      <div className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-5">
-        <p className="min-w-0 truncate text-sm font-semibold text-foreground">
+      <div className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-3 sm:h-16 sm:gap-4 sm:px-5">
+        <p className="min-w-0 truncate text-sm font-semibold text-foreground sm:text-base">
           {attachment.title}
         </p>
         <button
@@ -47,7 +51,7 @@ export default function PdfViewerModal({ attachment, onClose }) {
         className="relative isolate flex-1 select-none"
       >
         <iframe
-          src={`${attachment.url}#toolbar=0`}
+          src={viewerSrc}
           title={attachment.title}
           className="h-full w-full border-0"
         />

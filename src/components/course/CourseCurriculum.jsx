@@ -108,7 +108,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
                       : "upcoming";
                     const row = (
                       <>
-                        <span className="flex min-w-0 items-center gap-3">
+                        <span className="flex min-w-0 flex-1 items-center gap-3">
                           <LessonMarker state={markerState} />
                           <MonitorPlay
                             size={18}
@@ -116,7 +116,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
                             strokeWidth={1.75}
                           />
                           <span
-                            className={`truncate text-base md:text-[17px] ${
+                            className={`min-w-0 flex-1 text-base md:text-[17px] ${
                               unlocked
                                 ? "text-foreground"
                                 : "text-muted-foreground"

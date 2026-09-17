@@ -27,7 +27,7 @@ export default function NavLink({ href, children, onClick, mobile = false }) {
     return (
       <Link
         href={href}
-        className="rounded-full bg-primary px-4 py-1.5 text-base font-medium text-primary-foreground"
+        className="whitespace-nowrap rounded-full bg-primary px-4 py-1.5 text-base font-medium text-primary-foreground"
       >
         {children}
       </Link>
@@ -37,7 +37,7 @@ export default function NavLink({ href, children, onClick, mobile = false }) {
   return (
     <Link
       href={href}
-      className="rounded-full px-4 py-1.5 text-base font-medium text-foreground transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
+      className="whitespace-nowrap rounded-full px-4 py-1.5 text-base font-medium text-foreground transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
     >
       {children}
     </Link>

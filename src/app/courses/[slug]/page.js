@@ -62,7 +62,7 @@ export default async function CoursePage({ params }) {
             <Clock size={13} />
             {course.duration}
           </span>
-          <h1 className="mt-4 text-5xl font-semibold leading-tight text-foreground md:text-6xl">
+          <h1 className="mt-4 text-3xl font-semibold leading-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
             {course.title}
           </h1>
           <p className="mt-4 max-w-md text-base leading-7 text-muted-foreground">
@@ -94,7 +94,7 @@ export default async function CoursePage({ params }) {
       <section className="border-t border-border bg-surface">
         <Container className="py-16">
           <Reveal>
-            <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
+            <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
               What&apos;s included
             </h2>
           </Reveal>
@@ -112,7 +112,7 @@ export default async function CoursePage({ params }) {
         <div className="grid gap-10 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <Reveal>
-              <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
+              <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
                 Course content
               </h2>
             </Reveal>
@@ -197,7 +197,7 @@ export default async function CoursePage({ params }) {
 
       <Container as="section" className="py-16">
         <Reveal>
-          <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
+          <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
             What students say
           </h2>
         </Reveal>

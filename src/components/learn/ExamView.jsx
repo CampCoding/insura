@@ -144,7 +144,7 @@ export default function ExamView({ course }) {
       </header>
 
       {stage === "intro" && (
-        <div className="flex flex-1 items-center justify-center overflow-y-auto px-6 py-12">
+        <div className="flex flex-1 items-center justify-center overflow-y-auto px-4 py-10 sm:px-6 sm:py-12">
           <div className="flex w-full max-w-2xl flex-col items-center gap-5 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-tint text-primary">
               <ClipboardList size={28} strokeWidth={1.75} />
@@ -197,7 +197,7 @@ export default function ExamView({ course }) {
           </aside>
 
           <main className="flex-1 overflow-y-auto">
-            <div className="flex w-full flex-col gap-6 px-8 py-10">
+            <div className="flex w-full flex-col gap-6 px-4 py-6 sm:px-8 sm:py-10">
               <p className="text-sm font-medium text-primary">
                 Question {currentIndex + 1} of {questions.length}
               </p>
@@ -281,7 +281,7 @@ export default function ExamView({ course }) {
       )}
 
       {stage === "result" && (
-        <div className="flex flex-1 items-start justify-center overflow-y-auto px-6 py-12">
+        <div className="flex flex-1 items-start justify-center overflow-y-auto px-4 py-10 sm:px-6 sm:py-12">
           <div className="flex w-full max-w-2xl flex-col items-center gap-5 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-tint text-primary">
               <Award size={28} strokeWidth={1.75} />

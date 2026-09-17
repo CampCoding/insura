@@ -85,7 +85,7 @@ export default function Hero() {
       <div className="relative mx-auto w-full max-w-4xl px-4 text-center sm:px-6">
         <SplitWords
           text="Rehab training, taught by specialists who still practice it."
-          className="mx-auto block font-display text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-6xl"
+          className="mx-auto block font-display text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
         />
         <p
           ref={subtextRef}

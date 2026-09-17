@@ -1,18 +1,16 @@
 export const SITE = {
   name: "Insura",
   tagline: "Medical rehabilitation training for practicing specialists",
-  whatsappNumber: "201000000000", // TODO: replace with real WhatsApp number
   email: "info@insura.example",
   social: {
-    facebook: "https://facebook.com/insura",
-    instagram: "https://instagram.com/insura",
-    tiktok: "https://tiktok.com/@insura",
+    facebook: "https://www.facebook.com",
+    instagram: "https://www.instagram.com",
+    tiktok: "https://www.tiktok.com",
   },
 };
 
-export function buildWhatsAppLink(message) {
-  const text = encodeURIComponent(message);
-  return `https://wa.me/${SITE.whatsappNumber}?text=${text}`;
+export function buildWhatsAppLink() {
+  return "https://www.whatsapp.com";
 }
 
 export function unsplashUrl(id, width, height) {

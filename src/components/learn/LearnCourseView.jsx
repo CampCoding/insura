@@ -5,7 +5,7 @@ import Container from "@/components/common/Container";
 import CourseCurriculum from "@/components/course/CourseCurriculum";
 import { getCourseStats, getFlatLessons, unsplashUrl } from "@/lib/site-data";
 import { useEnrollment } from "@/lib/useEnrollment";
-import { ClipboardList, FileText } from "lucide-react";
+import { ChevronRight, ClipboardList, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,7 +17,7 @@ function TabButton({ active, onClick, children }) {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+      className={`shrink-0 snap-start whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
         active
           ? "bg-primary text-primary-foreground"
           : "text-muted-foreground hover:bg-primary-tint hover:text-primary"
@@ -53,7 +53,7 @@ export default function LearnCourseView({ course }) {
 
   return (
     <Container as="section" className="py-12">
-      <h1 className="text-3xl font-semibold text-foreground md:text-[2.75rem]">
+      <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl lg:text-[2.75rem]">
         {course.title}
       </h1>
 
@@ -73,7 +73,7 @@ export default function LearnCourseView({ course }) {
             {stats.sections} sections · {completed.length}/{totalLessons}{" "}
             lessons complete
           </p>
-          <p className="text-2xl font-semibold text-foreground md:text-[1.75rem]">
+          <p className="text-xl font-semibold text-foreground sm:text-2xl md:text-[1.75rem]">
             {nextLesson ? nextLesson.title : "Course complete"}
           </p>
           {nextLesson && (
@@ -85,8 +85,8 @@ export default function LearnCourseView({ course }) {
       </div>
 
       <div className="mt-14 grid gap-10 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="min-w-0 md:col-span-2">
+          <div className="no-scrollbar flex snap-x snap-mandatory items-center gap-2 overflow-x-auto">
             <TabButton
               active={activeTab === "content"}
               onClick={() => setActiveTab("content")}
@@ -144,22 +144,27 @@ export default function LearnCourseView({ course }) {
                     key={attachment.title}
                     type="button"
                     onClick={() => setOpenAttachment(attachment)}
-                    className="flex items-center gap-4 rounded-card border border-border bg-surface p-5 text-left transition-colors hover:border-primary/40"
+                    className="flex items-center gap-3 rounded-card border border-border bg-surface p-4 text-left transition-colors hover:border-primary/40 sm:gap-4 sm:p-5"
                   >
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary">
-                      <FileText size={20} strokeWidth={1.75} />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary sm:h-11 sm:w-11">
+                      <FileText size={18} strokeWidth={1.75} className="sm:hidden" />
+                      <FileText size={20} strokeWidth={1.75} className="hidden sm:block" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-base font-semibold text-foreground">
+                      <p className="text-sm font-semibold text-foreground sm:text-base">
                         {attachment.title}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground sm:text-sm">
                         PDF · {attachment.pages} pages
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-medium text-primary">
+                    <span className="hidden shrink-0 text-sm font-medium text-primary sm:inline">
                       View
                     </span>
+                    <ChevronRight
+                      size={18}
+                      className="shrink-0 text-primary sm:hidden"
+                    />
                   </button>
                 ))}
               </div>
@@ -192,7 +197,7 @@ export default function LearnCourseView({ course }) {
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-semibold text-foreground">
+                <p className="text-base font-semibold text-foreground">
                   {course.instructor.name}
                 </p>
                 <p className="text-sm text-muted-foreground">

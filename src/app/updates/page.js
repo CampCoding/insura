@@ -17,7 +17,7 @@ export default function UpdatesPage() {
   return (
     <Container as="section" className="py-16">
       <Reveal className="max-w-2xl">
-        <h1 className="text-5xl font-semibold text-foreground md:text-6xl">
+        <h1 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
           Announcements
         </h1>
         <p className="mt-4 text-base leading-7 text-muted-foreground">

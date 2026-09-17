@@ -16,7 +16,7 @@ export default function ClinicalBand() {
       <div className="absolute inset-0 bg-gradient-to-t from-[#0f2747]/90 via-[#0f2747]/25 to-transparent" />
       <Reveal className="absolute inset-x-0 bottom-0 pb-10">
         <Container>
-          <p className="max-w-xl text-xl font-medium leading-snug text-white md:text-2xl">
+          <p className="max-w-xl text-lg font-medium leading-snug text-white sm:text-xl md:text-2xl">
             Every course is built with specialists who are still in the
             operating room and the clinic, not just the classroom.
           </p>

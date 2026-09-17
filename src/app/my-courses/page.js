@@ -46,7 +46,7 @@ export default function MyCoursesPage() {
 
   return (
     <Container as="section" className="py-16">
-      <h1 className="text-4xl font-semibold text-foreground md:text-5xl">
+      <h1 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
         My courses
       </h1>
 

@@ -32,7 +32,7 @@ export default function IncludesSection() {
       <div className="pointer-events-none absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-primary-tint blur-3xl" />
       <Container className="relative py-20">
         <Reveal>
-          <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
+          <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
             What&apos;s inside every course
           </h2>
         </Reveal>

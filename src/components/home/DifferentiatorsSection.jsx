@@ -31,7 +31,7 @@ export default function DifferentiatorsSection() {
   return (
     <Container as="section" className="py-20">
       <Reveal className="mx-auto max-w-2xl text-center">
-        <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
+        <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
           What makes Insura different
         </h2>
       </Reveal>
@@ -60,7 +60,7 @@ export default function DifferentiatorsSection() {
                 <p className="text-sm font-medium text-primary">
                   {item.subheading}
                 </p>
-                <h3 className="mt-2 text-2xl font-semibold text-foreground md:text-3xl">
+                <h3 className="mt-2 text-xl font-semibold text-foreground sm:text-2xl md:text-3xl">
                   {item.title}
                 </h3>
                 <p className="mt-4 text-base leading-7 text-muted-foreground">

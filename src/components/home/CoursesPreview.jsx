@@ -11,7 +11,7 @@ export default function CoursesPreview() {
   return (
     <Container as="section" className="py-20">
       <Reveal className="flex flex-wrap items-end justify-between gap-4">
-        <h2 className="text-4xl font-semibold text-foreground md:text-5xl">
+        <h2 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
           Our courses
         </h2>
         <Button href="/courses" variant="outline" className="text-sm">

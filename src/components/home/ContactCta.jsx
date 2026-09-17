@@ -7,7 +7,7 @@ export default function ContactCta() {
   return (
     <Container as="section" className="py-20">
       <Reveal className="flex flex-col items-center gap-6 rounded-card border border-border bg-primary-tint px-6 py-14 text-center">
-        <h2 className="max-w-2xl text-4xl font-semibold text-foreground md:text-5xl">
+        <h2 className="max-w-2xl text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
           Have a question about a course?
         </h2>
         <p className="max-w-md text-sm leading-6 text-muted-foreground">

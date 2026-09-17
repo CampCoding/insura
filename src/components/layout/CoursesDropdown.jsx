@@ -51,7 +51,7 @@ export default function CoursesDropdown() {
       <button
         type="button"
         onClick={() => (open ? setOpen(false) : openNow())}
-        className={`flex items-center gap-1 rounded-full px-4 py-1.5 text-base font-medium transition-colors duration-200 ${
+        className={`flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-1.5 text-base font-medium transition-colors duration-200 ${
           isActive
             ? "bg-primary text-primary-foreground"
             : "text-foreground hover:bg-primary hover:text-primary-foreground"

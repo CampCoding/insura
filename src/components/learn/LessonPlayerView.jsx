@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 function sectionMinutes(section) {
   return section.lessons.reduce((sum, item) => sum + item.minutes, 0);
@@ -27,6 +27,14 @@ function sectionMinutes(section) {
 export default function LessonPlayerView({ course, lesson }) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useLayoutEffect(() => {
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSidebarOpen(false);
+    }
+  }, []);
+
   const { ready, enrolled, completed, markLessonComplete } = useEnrollment(
     course.slug,
   );
@@ -238,7 +246,7 @@ export default function LessonPlayerView({ course, lesson }) {
         </aside>
 
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-7xl px-6 py-8">
+          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
             {lesson.preview && !enrolled && (
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-card border border-border bg-primary-tint px-4 py-3 text-sm text-primary">
                 <span>This is a free preview lesson.</span>

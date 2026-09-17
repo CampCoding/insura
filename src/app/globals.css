@@ -149,6 +149,15 @@ button:disabled {
   }
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 .swiper-button-disabled {
   opacity: 0.3;
   pointer-events: none;

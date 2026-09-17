@@ -67,9 +67,9 @@ export default function CourseCurriculum({ slug, curriculum }) {
               type="button"
               onClick={() => setOpenIndex(isOpen ? -1 : sectionIndex)}
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between gap-4 bg-surface px-6 py-5 text-left"
+              className="flex w-full flex-col gap-2 bg-surface px-4 py-4 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-5"
             >
-              <span className="text-lg font-semibold text-foreground">
+              <span className="text-base font-semibold text-foreground sm:text-lg">
                 {section.title}
               </span>
               <span className="flex shrink-0 items-center gap-3 text-sm text-muted-foreground">
@@ -82,7 +82,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
                 </span>
                 <ChevronDown
                   size={16}
-                  className={`text-primary transition-transform duration-300 ${
+                  className={`shrink-0 text-primary transition-transform duration-300 ${
                     isOpen ? "rotate-180" : ""
                   }`}
                 />

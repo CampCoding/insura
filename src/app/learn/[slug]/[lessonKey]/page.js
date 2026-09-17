@@ -24,11 +24,5 @@ export default async function LessonPage({ params }) {
   const lesson = getLessonByKey(course, lessonKey);
   if (!lesson) notFound();
 
-  return (
-    <LessonPlayerView
-      key={`${course.slug}-${lesson.key}`}
-      course={course}
-      lesson={lesson}
-    />
-  );
+  return <LessonPlayerView course={course} lesson={lesson} />;
 }

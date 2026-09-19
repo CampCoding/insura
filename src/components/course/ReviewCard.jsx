@@ -1,4 +1,7 @@
+"use client";
+
 import { Star } from "lucide-react";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 function getInitials(name) {
   return name
@@ -10,6 +13,8 @@ function getInitials(name) {
 }
 
 export default function ReviewCard({ review }) {
+  const { tf } = useLanguage();
+
   return (
     <div className="flex h-full gap-4 rounded-card border border-border bg-surface p-6">
       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-tint text-sm font-semibold text-primary">
@@ -28,13 +33,13 @@ export default function ReviewCard({ review }) {
         </div>
 
         <p className="mt-2 text-base leading-7 text-foreground">
-          &quot;{review.quote}&quot;
+          &quot;{tf(review.quote)}&quot;
         </p>
 
         <p className="mt-4 text-base font-semibold text-foreground">
           {review.name}
         </p>
-        <p className="text-base text-muted-foreground">{review.role}</p>
+        <p className="text-base text-muted-foreground">{tf(review.role)}</p>
       </div>
     </div>
   );

@@ -5,10 +5,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import CourseCard from "./CourseCard";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 import "swiper/css";
 import "swiper/css/navigation";
 
 export default function CourseSwiper({ courses }) {
+  const { t } = useLanguage();
   const [prevEl, setPrevEl] = useState(null);
   const [nextEl, setNextEl] = useState(null);
 
@@ -34,7 +36,7 @@ export default function CourseSwiper({ courses }) {
         <button
           ref={setPrevEl}
           type="button"
-          aria-label="Previous course"
+          aria-label={t("Previous course", "الدورة السابقة")}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           <ChevronLeft size={18} />
@@ -43,7 +45,7 @@ export default function CourseSwiper({ courses }) {
         <button
           ref={setNextEl}
           type="button"
-          aria-label="Next course"
+          aria-label={t("Next course", "الدورة التالية")}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           <ChevronRight size={18} />

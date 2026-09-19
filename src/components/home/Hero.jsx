@@ -7,10 +7,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { buildWhatsAppLink, unsplashUrl } from "@/lib/site-data";
 import SplitWords from "@/components/common/SplitWords";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
+  const { t } = useLanguage();
   const sectionRef = useRef(null);
   const imageRef = useRef(null);
   const subtextRef = useRef(null);
@@ -84,15 +86,20 @@ export default function Hero() {
 
       <div className="relative mx-auto w-full max-w-4xl px-4 text-center sm:px-6">
         <SplitWords
-          text="Rehab training, taught by specialists who still practice it."
+          text={t(
+            "Rehab training, taught by specialists who still practice it.",
+            "تدريب في إعادة التأهيل، يقدّمه متخصصون ما زالوا يمارسون المهنة."
+          )}
           className="mx-auto block font-display text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
         />
         <p
           ref={subtextRef}
           className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/80 sm:mt-6 sm:text-base sm:leading-7"
         >
-          Video lessons, downloadable PDFs, exam banks and clinical notes for
-          physiotherapists building a stronger rehab practice.
+          {t(
+            "Video lessons, downloadable PDFs, exam banks and clinical notes for physiotherapists building a stronger rehab practice.",
+            "فيديوهات تعليمية، ملفات PDF قابلة للتحميل، بنك أسئلة امتحانات وملاحظات إكلينيكية لأخصائيي العلاج الطبيعي الراغبين في تطوير ممارستهم المهنية."
+          )}
         </p>
         <div
           ref={ctaRef}
@@ -107,13 +114,13 @@ export default function Hero() {
             className="btn-shimmer inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#0f2747] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#25D366] hover:text-white active:scale-[0.98] sm:px-6 sm:py-3 sm:text-[15px]"
             style={{ "--shimmer-color": "rgba(15, 39, 71, 0.12)" }}
           >
-            Chat on WhatsApp
+            {t("Chat on WhatsApp", "تواصل عبر واتساب")}
           </Link>
           <Link
             href="/courses"
             className="btn-shimmer inline-flex items-center justify-center rounded-full border border-white/50 px-5 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white active:scale-[0.98] sm:px-6 sm:py-3 sm:text-[15px]"
           >
-            Browse courses
+            {t("Browse courses", "استعرض الدورات")}
           </Link>
         </div>
       </div>

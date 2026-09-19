@@ -5,8 +5,10 @@ import Button from "@/components/common/Button";
 import Logo from "@/components/layout/Logo";
 import Link from "next/link";
 import { useState } from "react";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,14 +21,16 @@ export default function LoginPage() {
       <Logo className="mb-8" imageClassName="h-24" />
 
       <div className="w-full max-w-md rounded-card border border-border bg-surface p-8">
-        <h1 className="text-xl font-semibold text-foreground sm:text-2xl">Log in</h1>
+        <h1 className="text-xl font-semibold text-foreground sm:text-2xl">
+          {t("Log in", "تسجيل الدخول")}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Welcome back, log in to continue.
+          {t("Welcome back, log in to continue.", "أهلًا بعودتك، سجّل الدخول للمتابعة.")}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <Input
-            label="Email"
+            label={t("Email", "البريد الإلكتروني")}
             type="email"
             placeholder="you@example.com"
             value={email}
@@ -35,23 +39,23 @@ export default function LoginPage() {
           />
 
           <Input
-            label="Password"
+            label={t("Password", "كلمة المرور")}
             type="password"
-            placeholder="Your password"
+            placeholder={t("Your password", "كلمة المرور الخاصة بك")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
           <Button type="submit" className="mt-2 w-full">
-            Log in
+            {t("Log in", "تسجيل الدخول")}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          {t("Don't have an account?", "ليس لديك حساب؟")}{" "}
           <Link href="/register" className="font-medium text-primary">
-            Create one
+            {t("Create one", "أنشئ حسابًا")}
           </Link>
         </p>
       </div>

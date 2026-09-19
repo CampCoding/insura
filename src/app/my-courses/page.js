@@ -15,6 +15,7 @@ import {
   getCompletedLessons,
   getEnrolledSlugs,
 } from "@/lib/enrollment";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 function readEnrolledCourses() {
   return getEnrolledSlugs()
@@ -31,6 +32,7 @@ function readEnrolledCourses() {
 }
 
 export default function MyCoursesPage() {
+  const { t, tf } = useLanguage();
   const [enrolledCourses, setEnrolledCourses] = useState([]);
 
   useEffect(() => {
@@ -47,16 +49,16 @@ export default function MyCoursesPage() {
   return (
     <Container as="section" className="py-16">
       <h1 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
-        My courses
+        {t("My courses", "دوراتي")}
       </h1>
 
       {enrolledCourses.length === 0 ? (
         <div className="mt-8 rounded-card border border-border bg-surface p-10 text-center">
           <p className="text-base text-muted-foreground">
-            You haven&apos;t enrolled in any course yet.
+            {t("You haven't enrolled in any course yet.", "لم تشترك في أي دورة بعد.")}
           </p>
           <Button href="/courses" className="mt-5 w-fit">
-            Browse courses
+            {t("Browse courses", "استعرض الدورات")}
           </Button>
         </div>
       ) : (
@@ -70,7 +72,7 @@ export default function MyCoursesPage() {
               <div className="relative aspect-video overflow-hidden">
                 <Image
                   src={unsplashUrl(course.image, 640, 400)}
-                  alt={course.title}
+                  alt={tf(course.title)}
                   fill
                   sizes="(min-width: 768px) 320px, 100vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -78,11 +80,11 @@ export default function MyCoursesPage() {
               </div>
               <div className="flex flex-1 flex-col p-5">
                 <h3 className="text-base font-semibold text-foreground">
-                  {course.title}
+                  {tf(course.title)}
                 </h3>
                 <div className="mt-4">
                   <p className="text-xs font-medium text-muted-foreground">
-                    {progress}% complete
+                    {t(`${progress}% complete`, `${progress}% مكتمل`)}
                   </p>
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-primary-tint">
                     <div

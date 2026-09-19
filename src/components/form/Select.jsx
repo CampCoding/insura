@@ -59,7 +59,7 @@ export default function Select({
         </button>
 
         {open && (
-          <div className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-card border border-border bg-background p-1.5 shadow-lg shadow-foreground/10">
+          <div className="custom-scrollbar absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-card border border-border bg-background p-1.5 shadow-lg shadow-foreground/10">
             {options.map((option) => (
               <button
                 key={option.value}

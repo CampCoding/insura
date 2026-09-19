@@ -7,8 +7,10 @@ import Button from "@/components/common/Button";
 import Logo from "@/components/layout/Logo";
 import Link from "next/link";
 import { useState } from "react";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 export default function RegisterPage() {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState(null);
   const [email, setEmail] = useState("");
@@ -20,7 +22,7 @@ export default function RegisterPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError("Passwords don't match.");
+      setError(t("Passwords don't match.", "كلمتا المرور غير متطابقتين."));
       return;
     }
     setError("");
@@ -32,16 +34,16 @@ export default function RegisterPage() {
 
       <div className="w-full max-w-3xl rounded-card border border-border bg-surface p-8">
         <h1 className="text-xl font-semibold text-foreground sm:text-2xl md:text-3xl">
-          Create an account
+          {t("Create an account", "إنشاء حساب")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Sign up to start learning with Insura.
+          {t("Sign up to start learning with Insura.", "سجّل لتبدأ التعلّم مع Insura.")}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
-              label="Name"
+              label={t("Name", "الاسم")}
               placeholder="Ahmed Mostafa"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -49,7 +51,7 @@ export default function RegisterPage() {
             />
 
             <DatePicker
-              label="Birthdate"
+              label={t("Birthdate", "تاريخ الميلاد")}
               value={birthdate}
               onChange={setBirthdate}
             />
@@ -57,7 +59,7 @@ export default function RegisterPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
-              label="Email"
+              label={t("Email", "البريد الإلكتروني")}
               type="email"
               placeholder="you@example.com"
               value={email}
@@ -66,7 +68,7 @@ export default function RegisterPage() {
             />
 
             <PhoneInput
-              label="Phone number"
+              label={t("Phone number", "رقم الهاتف")}
               value={phone}
               onChange={setPhone}
             />
@@ -74,18 +76,18 @@ export default function RegisterPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
-              label="Password"
+              label={t("Password", "كلمة المرور")}
               type="password"
-              placeholder="At least 8 characters"
+              placeholder={t("At least 8 characters", "8 أحرف على الأقل")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
 
             <Input
-              label="Confirm password"
+              label={t("Confirm password", "تأكيد كلمة المرور")}
               type="password"
-              placeholder="Re-enter your password"
+              placeholder={t("Re-enter your password", "أعد إدخال كلمة المرور")}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               error={error}
@@ -94,14 +96,14 @@ export default function RegisterPage() {
           </div>
 
           <Button type="submit" className="mt-2 w-full">
-            Create account
+            {t("Create account", "إنشاء الحساب")}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
+          {t("Already have an account?", "لديك حساب بالفعل؟")}{" "}
           <Link href="/login" className="font-medium text-primary">
-            Log in
+            {t("Log in", "تسجيل الدخول")}
           </Link>
         </p>
       </div>

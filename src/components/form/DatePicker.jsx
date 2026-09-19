@@ -2,23 +2,43 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+const MONTHS = {
+  en: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
+  ar: [
+    "يناير",
+    "فبراير",
+    "مارس",
+    "أبريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "أغسطس",
+    "سبتمبر",
+    "أكتوبر",
+    "نوفمبر",
+    "ديسمبر",
+  ],
+};
 
-const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const WEEKDAYS = {
+  en: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+  ar: ["ح", "ن", "ث", "ر", "خ", "ج", "س"],
+};
 
 function daysInMonth(year, month) {
   return new Date(year, month + 1, 0).getDate();
@@ -38,9 +58,13 @@ export default function DatePicker({
   label,
   value,
   onChange,
-  placeholder = "Select date",
+  placeholder,
   error,
 }) {
+  const { t, lang } = useLanguage();
+  const months = MONTHS[lang];
+  const weekdays = WEEKDAYS[lang];
+  const resolvedPlaceholder = placeholder ?? t("Select date", "اختر تاريخًا");
   const today = new Date();
   const [open, setOpen] = useState(false);
   const [view, setView] = useState("days");
@@ -95,7 +119,7 @@ export default function DatePicker({
   ];
 
   const formatted = value
-    ? value.toLocaleDateString("en-GB", {
+    ? value.toLocaleDateString(lang === "ar" ? "ar-EG" : "en-GB", {
         day: "2-digit",
         month: "short",
         year: "numeric",
@@ -122,7 +146,7 @@ export default function DatePicker({
           }`}
         >
           <span className={value ? "text-foreground" : "text-muted-foreground"}>
-            {formatted || placeholder}
+            {formatted || resolvedPlaceholder}
           </span>
           <Calendar size={17} className="shrink-0 text-muted-foreground" />
         </button>
@@ -142,7 +166,7 @@ export default function DatePicker({
                 onClick={() => setView(view === "days" ? "years" : "days")}
                 className="rounded-full px-3 py-1 text-sm font-semibold text-foreground transition-colors hover:bg-primary-tint hover:text-primary"
               >
-                {MONTHS[viewMonth]} {viewYear}
+                {months[viewMonth]} {viewYear}
               </button>
               <button
                 type="button"
@@ -154,7 +178,7 @@ export default function DatePicker({
             </div>
 
             {view === "years" ? (
-              <div className="grid max-h-60 grid-cols-3 gap-1 overflow-y-auto">
+              <div className="custom-scrollbar grid max-h-60 grid-cols-3 gap-1 overflow-y-auto">
                 {years.map((year) => (
                   <button
                     key={year}
@@ -176,9 +200,9 @@ export default function DatePicker({
             ) : (
               <>
                 <div className="grid grid-cols-7 gap-1 pb-1">
-                  {WEEKDAYS.map((day) => (
+                  {weekdays.map((day, index) => (
                     <span
-                      key={day}
+                      key={index}
                       className="flex h-8 items-center justify-center text-xs font-medium text-muted-foreground"
                     >
                       {day}

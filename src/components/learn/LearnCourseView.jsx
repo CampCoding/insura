@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import PdfViewerModal from "./PdfViewerModal";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 function TabButton({ active, onClick, children }) {
   return (
@@ -29,11 +30,12 @@ function TabButton({ active, onClick, children }) {
 }
 
 export default function LearnCourseView({ course }) {
+  const { t, tf, lang } = useLanguage();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("content");
   const [openAttachment, setOpenAttachment] = useState(null);
   const { ready, enrolled, completed } = useEnrollment(course.slug);
-  const stats = getCourseStats(course);
+  const stats = getCourseStats(course, lang);
   const flatLessons = getFlatLessons(course);
   const totalLessons = flatLessons.length;
   const progressPercent = totalLessons
@@ -54,14 +56,14 @@ export default function LearnCourseView({ course }) {
   return (
     <Container as="section" className="py-12">
       <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl lg:text-[2.75rem]">
-        {course.title}
+        {tf(course.title)}
       </h1>
 
       <div className="mt-8 flex flex-col gap-8 rounded-card border border-border bg-surface p-6 lg:flex-row lg:items-center lg:gap-10 lg:p-8">
         <div className="w-full overflow-hidden rounded-card lg:w-[440px] lg:shrink-0">
           <Image
             src={unsplashUrl(course.image, 800, 600)}
-            alt={course.title}
+            alt={tf(course.title)}
             width={800}
             height={600}
             priority
@@ -70,15 +72,19 @@ export default function LearnCourseView({ course }) {
         </div>
         <div className="flex flex-col items-start gap-4">
           <p className="text-base text-muted-foreground">
-            {stats.sections} sections · {completed.length}/{totalLessons}{" "}
-            lessons complete
+            {t(
+              `${stats.sections} sections · ${completed.length}/${totalLessons} lessons complete`,
+              `${stats.sections} أقسام · ${completed.length}/${totalLessons} دروس مكتملة`
+            )}
           </p>
           <p className="text-xl font-semibold text-foreground sm:text-2xl md:text-[1.75rem]">
-            {nextLesson ? nextLesson.title : "Course complete"}
+            {nextLesson ? tf(nextLesson.title) : t("Course complete", "الدورة مكتملة")}
           </p>
           {nextLesson && (
             <Button href={`/learn/${course.slug}/${nextLesson.key}`}>
-              {completed.length ? "Continue lesson" : "Start lesson"}
+              {completed.length
+                ? t("Continue lesson", "متابعة الدرس")
+                : t("Start lesson", "ابدأ الدرس")}
             </Button>
           )}
         </div>
@@ -91,14 +97,14 @@ export default function LearnCourseView({ course }) {
               active={activeTab === "content"}
               onClick={() => setActiveTab("content")}
             >
-              Course content
+              {t("Course content", "محتوى الدورة")}
             </TabButton>
             {course.exam && (
               <TabButton
                 active={activeTab === "exam"}
                 onClick={() => setActiveTab("exam")}
               >
-                Exam
+                {t("Exam", "الاختبار")}
               </TabButton>
             )}
             {course.attachments && (
@@ -106,7 +112,7 @@ export default function LearnCourseView({ course }) {
                 active={activeTab === "attachments"}
                 onClick={() => setActiveTab("attachments")}
               >
-                Attachments
+                {t("Attachments", "المرفقات")}
               </TabButton>
             )}
           </div>
@@ -126,14 +132,18 @@ export default function LearnCourseView({ course }) {
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-foreground">
-                    {course.exam.title}
+                    {tf(course.exam.title)}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {course.exam.questions.length} questions · test what
-                    you&apos;ve learned across the full course.
+                    {t(
+                      `${course.exam.questions.length} questions · test what you've learned across the full course.`,
+                      `${course.exam.questions.length} أسئلة · اختبر ما تعلمته على مدار الدورة كاملة.`
+                    )}
                   </p>
                 </div>
-                <Button href={`/learn/${course.slug}/exam`}>Start Exam</Button>
+                <Button href={`/learn/${course.slug}/exam`}>
+                  {t("Start Exam", "ابدأ الاختبار")}
+                </Button>
               </div>
             )}
 
@@ -141,7 +151,7 @@ export default function LearnCourseView({ course }) {
               <div className="flex flex-col gap-3">
                 {course.attachments.map((attachment) => (
                   <button
-                    key={attachment.title}
+                    key={attachment.title.en}
                     type="button"
                     onClick={() => setOpenAttachment(attachment)}
                     className="flex items-center gap-3 rounded-card border border-border bg-surface p-4 text-left transition-colors hover:border-primary/40 sm:gap-4 sm:p-5"
@@ -152,14 +162,14 @@ export default function LearnCourseView({ course }) {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-foreground sm:text-base">
-                        {attachment.title}
+                        {tf(attachment.title)}
                       </p>
                       <p className="text-xs text-muted-foreground sm:text-sm">
-                        PDF · {attachment.pages} pages
+                        {t(`PDF · ${attachment.pages} pages`, `PDF · ${attachment.pages} صفحات`)}
                       </p>
                     </div>
                     <span className="hidden shrink-0 text-sm font-medium text-primary sm:inline">
-                      View
+                      {t("View", "عرض")}
                     </span>
                     <ChevronRight
                       size={18}
@@ -175,7 +185,7 @@ export default function LearnCourseView({ course }) {
         <div className="flex flex-col gap-6">
           <div className="rounded-card border border-border bg-surface p-6">
             <p className="text-base font-semibold text-foreground">
-              {progressPercent}% complete
+              {t(`${progressPercent}% complete`, `${progressPercent}% مكتمل`)}
             </p>
             <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-primary-tint">
               <div
@@ -201,7 +211,7 @@ export default function LearnCourseView({ course }) {
                   {course.instructor.name}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {course.instructor.title}
+                  {tf(course.instructor.title)}
                 </p>
               </div>
             </div>
@@ -211,7 +221,7 @@ export default function LearnCourseView({ course }) {
             href={`/courses/${course.slug}`}
             className="text-center text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
           >
-            Back to course details
+            {t("Back to course details", "العودة لتفاصيل الدورة")}
           </Link>
         </div>
       </div>

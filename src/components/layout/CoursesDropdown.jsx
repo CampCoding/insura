@@ -7,10 +7,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLanguage } from "./LanguageProvider";
 
 const PREVIEW_COURSES = COURSES.slice(0, 5);
 
 export default function CoursesDropdown() {
+  const { t, tf } = useLanguage();
   const pathname = usePathname();
   const isActive = pathname.startsWith("/courses");
   const [open, setOpen] = useState(false);
@@ -57,7 +59,7 @@ export default function CoursesDropdown() {
             : "text-foreground hover:bg-primary hover:text-primary-foreground"
         }`}
       >
-        Courses
+        {t("Courses", "الدورات")}
         <ChevronDown
           size={16}
           className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
@@ -81,11 +83,11 @@ export default function CoursesDropdown() {
                 className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-primary-tint"
               >
                 <span className="text-sm font-medium text-foreground">
-                  {course.title}
+                  {tf(course.title)}
                 </span>
                 <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
                   <Clock size={12} />
-                  {course.duration}
+                  {tf(course.duration)}
                 </span>
               </Link>
             ))}
@@ -93,7 +95,7 @@ export default function CoursesDropdown() {
               href="/courses"
               className="mt-1 block rounded-xl px-3 py-2.5 text-center text-sm font-medium text-primary hover:bg-primary-tint"
             >
-              View all courses
+              {t("View all courses", "عرض جميع الدورات")}
             </Link>
           </div>,
           document.body,

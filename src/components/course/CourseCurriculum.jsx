@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check, ChevronDown, Lock, MonitorPlay } from "lucide-react";
 import { formatMinutes } from "@/lib/site-data";
 import { useEnrollment } from "@/lib/useEnrollment";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 function sectionMinutes(section) {
   return section.lessons.reduce((sum, lesson) => sum + lesson.minutes, 0);
@@ -41,7 +42,8 @@ export function LessonMarker({ state }) {
 }
 
 export default function CourseCurriculum({ slug, curriculum }) {
-  const [openIndex, setOpenIndex] = useState(0);
+  const { t, tf, lang } = useLanguage();
+  const [openIndexes, setOpenIndexes] = useState(() => new Set([0]));
   const { enrolled, completed } = useEnrollment(slug);
   const flatKeys = curriculum.flatMap((section, sectionIndex) =>
     section.lessons.map((_, lessonIndex) => `${sectionIndex}-${lessonIndex}`)
@@ -53,32 +55,51 @@ export default function CourseCurriculum({ slug, curriculum }) {
   return (
     <div className="flex flex-col gap-3">
       {curriculum.map((section, sectionIndex) => {
-        const isOpen = openIndex === sectionIndex;
+        const isOpen = openIndexes.has(sectionIndex);
         const sectionDone = section.lessons.filter((_, lessonIndex) =>
           completed.includes(`${sectionIndex}-${lessonIndex}`)
         ).length;
+        const toggleOpen = () =>
+          setOpenIndexes((prev) => {
+            const next = new Set(prev);
+            if (next.has(sectionIndex)) {
+              next.delete(sectionIndex);
+            } else {
+              next.add(sectionIndex);
+            }
+            return next;
+          });
 
         return (
           <div
-            key={section.title}
-            className="overflow-hidden rounded-card border border-border bg-background"
+            key={tf(section.title)}
+            className="overflow-hidden rounded-card border border-border bg-surface"
           >
             <button
               type="button"
-              onClick={() => setOpenIndex(isOpen ? -1 : sectionIndex)}
+              onClick={toggleOpen}
               aria-expanded={isOpen}
-              className="flex w-full flex-col gap-2 bg-surface px-4 py-4 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-5"
+              className="flex w-full flex-col gap-2 border-b-2 border-border bg-background px-4 py-4 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-5"
             >
               <span className="text-base font-semibold text-foreground sm:text-lg">
-                {section.title}
+                {tf(section.title)}
               </span>
               <span className="flex shrink-0 items-center gap-3 text-sm text-muted-foreground">
                 <span>
                   {enrolled
-                    ? `${sectionDone}/${section.lessons.length} complete`
-                    : `${section.lessons.length} lessons · ${formatMinutes(
-                        sectionMinutes(section)
-                      )}`}
+                    ? t(
+                        `${sectionDone}/${section.lessons.length} complete`,
+                        `${sectionDone}/${section.lessons.length} مكتمل`
+                      )
+                    : t(
+                        `${section.lessons.length} lessons · ${formatMinutes(
+                          sectionMinutes(section)
+                        )}`,
+                        `${section.lessons.length} دروس · ${formatMinutes(
+                          sectionMinutes(section),
+                          lang
+                        )}`
+                      )}
                 </span>
                 <ChevronDown
                   size={16}
@@ -94,7 +115,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
               style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
             >
               <div className="overflow-hidden">
-                <ul className="flex flex-col gap-1 border-t border-border px-6 py-3">
+                <ul className="flex flex-col divide-y divide-border px-6 py-1">
                   {section.lessons.map((lesson, lessonIndex) => {
                     const key = `${sectionIndex}-${lessonIndex}`;
                     const isDone = completed.includes(key);
@@ -122,23 +143,23 @@ export default function CourseCurriculum({ slug, curriculum }) {
                                 : "text-muted-foreground"
                             }`}
                           >
-                            {lesson.title}
+                            {lessonIndex + 1}- {tf(lesson.title)}
                           </span>
                           {lesson.preview && !enrolled && (
                             <span className="shrink-0 rounded-full bg-primary-tint px-2 py-0.5 text-xs font-medium text-primary">
-                              Preview
+                              {t("Preview", "معاينة")}
                             </span>
                           )}
                         </span>
                         <span className="shrink-0 text-sm text-muted-foreground">
-                          {formatMinutes(lesson.minutes)}
+                          {formatMinutes(lesson.minutes, lang)}
                         </span>
                       </>
                     );
 
                     if (unlocked) {
                       return (
-                        <li key={lesson.title}>
+                        <li key={tf(lesson.title)}>
                           <Link
                             href={`/learn/${slug}/${key}`}
                             className="flex items-center justify-between gap-4 rounded-lg px-1 py-3 transition-colors hover:bg-primary-tint"
@@ -151,7 +172,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
 
                     return (
                       <li
-                        key={lesson.title}
+                        key={tf(lesson.title)}
                         className="flex items-center justify-between gap-4 px-1 py-3"
                       >
                         {row}

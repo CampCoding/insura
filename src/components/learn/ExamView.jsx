@@ -16,6 +16,8 @@ import {
 import Button from "@/components/common/Button";
 import CaptureGuardOverlay from "@/components/common/CaptureGuardOverlay";
 import ThemeToggle from "@/components/layout/ThemeToggle";
+import LanguageToggle from "@/components/layout/LanguageToggle";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 import { useAntiCaptureGuard } from "@/lib/useAntiCaptureGuard";
 import { useEnrollment } from "@/lib/useEnrollment";
 
@@ -43,12 +45,24 @@ function ExamQuestionMarker({ index, isCurrent, isAnswered, isMarked, onClick })
 }
 
 export default function ExamView({ course }) {
+  const { t, tf, lang } = useLanguage();
   const router = useRouter();
   const rootRef = useRef(null);
   const { ready, enrolled } = useEnrollment(course.slug);
   const questions = course.exam.questions;
 
   const [stage, setStage] = useState("intro");
+  const [examLang, setExamLang] = useState(null);
+  // Stay on the site language while the picker is showing so nothing
+  // flips mid-screen; only switch once the exam itself actually starts.
+  const displayLang = stage === "intro" ? lang : examLang ?? lang;
+  const T = (en, ar) => (displayLang === "ar" ? ar : en);
+  const TF = (field) =>
+    typeof field === "string"
+      ? field
+      : displayLang === "ar"
+      ? field.ar ?? field.en
+      : field.en;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState(() => Array(questions.length).fill(null));
   const [marked, setMarked] = useState(() => new Set());
@@ -96,6 +110,7 @@ export default function ExamView({ course }) {
   };
 
   const handleStart = () => {
+    if (!examLang) return;
     requestFullscreen();
     setStage("exam");
   };
@@ -130,17 +145,24 @@ export default function ExamView({ course }) {
   if (!ready || !enrolled) return null;
 
   return (
-    <div ref={rootRef} className="flex h-dvh flex-col overflow-hidden bg-background">
+    <div
+      ref={rootRef}
+      dir={displayLang === "ar" ? "rtl" : "ltr"}
+      className="flex h-dvh flex-col overflow-hidden bg-background"
+    >
       <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-5">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-foreground">
-            {course.exam.title}
+            {TF(course.exam.title)}
           </p>
           <p className="truncate text-xs text-muted-foreground">
-            {course.exam.subject}
+            {TF(course.exam.subject)}
           </p>
         </div>
-        <ThemeToggle />
+        <div className="flex shrink-0 items-center gap-1">
+          {!examLang && <LanguageToggle compact />}
+          <ThemeToggle />
+        </div>
       </header>
 
       {stage === "intro" && (
@@ -150,27 +172,80 @@ export default function ExamView({ course }) {
               <ClipboardList size={28} strokeWidth={1.75} />
             </div>
             <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
-              {course.exam.title}
+              {TF(course.exam.title)}
             </h1>
             <p className="text-muted-foreground">
-              {course.exam.subject} · {questions.length} questions
+              {TF(course.exam.subject)} ·{" "}
+              {T(`${questions.length} questions`, `${questions.length} أسئلة`)}
             </p>
             <ul className="flex w-full max-w-md flex-col gap-2 text-left text-sm text-muted-foreground">
               <li>
-                The exam opens in fullscreen mode and stays open until you submit.
+                {T(
+                  "The exam opens in fullscreen mode and stays open until you submit.",
+                  "يفتح الاختبار في وضع ملء الشاشة ويبقى كذلك حتى تسليمه."
+                )}
               </li>
               <li>
-                If you exit fullscreen, you will be asked to return before you can
-                continue.
+                {T(
+                  "If you exit fullscreen, you will be asked to return before you can continue.",
+                  "إذا خرجت من وضع ملء الشاشة، سيُطلب منك العودة قبل المتابعة."
+                )}
               </li>
               <li>
-                You can move between questions freely and mark any of them to
-                revisit later.
+                {T(
+                  "You can move between questions freely and mark any of them to revisit later.",
+                  "يمكنك التنقل بين الأسئلة بحرية ووضع علامة على أي منها للعودة إليه لاحقًا."
+                )}
               </li>
             </ul>
-            <Button onClick={handleStart} className="mt-3">
+
+            <div className="mt-2 flex w-full flex-col items-center gap-3 rounded-card border border-border bg-surface p-5">
+              <p className="text-sm font-medium text-foreground">
+                {t("Choose the exam language", "اختر لغة الاختبار")}
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setExamLang("en")}
+                  aria-pressed={examLang === "en"}
+                  className={`rounded-full border px-5 py-2 text-sm font-medium transition-colors ${
+                    examLang === "en"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setExamLang("ar")}
+                  aria-pressed={examLang === "ar"}
+                  className={`rounded-full border px-5 py-2 text-sm font-medium transition-colors ${
+                    examLang === "ar"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  العربية
+                </button>
+              </div>
+              {!examLang && (
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    "You must choose a language to start the exam.",
+                    "يجب اختيار لغة لبدء الاختبار."
+                  )}
+                </p>
+              )}
+            </div>
+
+            <Button
+              onClick={handleStart}
+              disabled={!examLang}
+              className={`mt-3 ${!examLang ? "pointer-events-none opacity-40" : ""}`}
+            >
               <Maximize size={16} />
-              Start Exam
+              {T("Start Exam", "ابدأ الاختبار")}
             </Button>
           </div>
         </div>
@@ -181,7 +256,7 @@ export default function ExamView({ course }) {
           onContextMenu={(event) => event.preventDefault()}
           className="relative isolate flex flex-1 select-none flex-col overflow-hidden sm:flex-row"
         >
-          <aside className="flex shrink-0 gap-2 overflow-x-auto border-b border-border bg-surface p-3 sm:w-auto sm:flex-col sm:items-center sm:overflow-x-hidden sm:overflow-y-auto sm:border-b-0 sm:border-r">
+          <aside className="custom-scrollbar flex shrink-0 gap-2 overflow-x-auto border-b border-border bg-surface p-3 sm:w-auto sm:flex-col sm:items-center sm:overflow-x-hidden sm:overflow-y-auto sm:border-b-0 sm:border-r">
             <div className="flex gap-2 sm:flex-col sm:items-center sm:gap-2.5">
               {questions.map((_, i) => (
                 <ExamQuestionMarker
@@ -199,14 +274,17 @@ export default function ExamView({ course }) {
           <main className="flex-1 overflow-y-auto">
             <div className="flex w-full flex-col gap-6 px-4 py-6 sm:px-8 sm:py-10">
               <p className="text-sm font-medium text-primary">
-                Question {currentIndex + 1} of {questions.length}
+                {T(
+                  `Question ${currentIndex + 1} of ${questions.length}`,
+                  `السؤال ${currentIndex + 1} من ${questions.length}`
+                )}
               </p>
               <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                {question.question}
+                {TF(question.question)}
               </h2>
 
               <div className="flex flex-col gap-3">
-                {question.options.map((option, i) => {
+                {question.options[displayLang].map((option, i) => {
                   const selected = answers[currentIndex] === i;
                   return (
                     <button
@@ -245,7 +323,9 @@ export default function ExamView({ course }) {
                   }`}
                 >
                   <Flag size={15} strokeWidth={1.75} />
-                  {marked.has(currentIndex) ? "Marked for review" : "Mark for review"}
+                  {marked.has(currentIndex)
+                    ? T("Marked for review", "تم وضع علامة للمراجعة")
+                    : T("Mark for review", "وضع علامة للمراجعة")}
                 </button>
 
                 <div className="flex items-center gap-3">
@@ -255,20 +335,22 @@ export default function ExamView({ course }) {
                     onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
                     className={currentIndex === 0 ? "pointer-events-none opacity-40" : ""}
                   >
-                    <ChevronLeft size={16} />
-                    Previous
+                    <ChevronLeft size={16} className="rtl:rotate-180" />
+                    {T("Previous", "السابق")}
                   </Button>
 
                   {isLast ? (
-                    <Button onClick={handleSubmit}>Submit Exam</Button>
+                    <Button onClick={handleSubmit}>
+                      {T("Submit Exam", "تسليم الاختبار")}
+                    </Button>
                   ) : (
                     <Button
                       onClick={() =>
                         setCurrentIndex((i) => Math.min(questions.length - 1, i + 1))
                       }
                     >
-                      Next
-                      <ChevronRight size={16} />
+                      {T("Next", "التالي")}
+                      <ChevronRight size={16} className="rtl:rotate-180" />
                     </Button>
                   )}
                 </div>
@@ -287,12 +369,21 @@ export default function ExamView({ course }) {
               <Award size={28} strokeWidth={1.75} />
             </div>
             <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
-              You scored {score}/{questions.length}
+              {T(
+                `You scored ${score}/${questions.length}`,
+                `نتيجتك ${score}/${questions.length}`
+              )}
             </h2>
             <p className="text-muted-foreground">
               {score >= Math.ceil(questions.length * 0.6)
-                ? "Great job — you passed the assessment."
-                : "Review the related lessons and try again when you're ready."}
+                ? T(
+                    "Great job — you passed the assessment.",
+                    "أحسنت — لقد اجتزت الاختبار."
+                  )
+                : T(
+                    "Review the related lessons and try again when you're ready.",
+                    "راجع الدروس المرتبطة وحاول مجددًا عندما تكون مستعدًا."
+                  )}
             </p>
 
             <div className="mt-3 flex w-full flex-col gap-2 text-left">
@@ -300,7 +391,7 @@ export default function ExamView({ course }) {
                 const isCorrect = answers[i] === q.correctIndex;
                 return (
                   <div
-                    key={q.question}
+                    key={q.question.en}
                     className={`flex items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm ${
                       isCorrect
                         ? "border-border"
@@ -308,7 +399,7 @@ export default function ExamView({ course }) {
                     }`}
                   >
                     <span className="min-w-0 flex-1 text-foreground">
-                      {i + 1}. {q.question}
+                      {i + 1}. {TF(q.question)}
                     </span>
                     {isCorrect ? (
                       <CheckCircle2
@@ -329,7 +420,7 @@ export default function ExamView({ course }) {
             </div>
 
             <Button href={`/learn/${course.slug}`} className="mt-4">
-              Back to course
+              {T("Back to course", "العودة للدورة")}
             </Button>
           </div>
         </div>
@@ -340,14 +431,17 @@ export default function ExamView({ course }) {
           <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-card bg-surface p-8 text-center shadow-xl">
             <AlertTriangle size={30} className="text-amber-500" strokeWidth={1.75} />
             <p className="text-lg font-semibold text-foreground">
-              You exited fullscreen
+              {T("You exited fullscreen", "لقد خرجت من وضع ملء الشاشة")}
             </p>
             <p className="text-sm text-muted-foreground">
-              Return to fullscreen mode to continue the exam.
+              {T(
+                "Return to fullscreen mode to continue the exam.",
+                "عُد إلى وضع ملء الشاشة لمتابعة الاختبار."
+              )}
             </p>
             <Button onClick={requestFullscreen}>
               <Maximize size={16} />
-              Return to Fullscreen
+              {T("Return to Fullscreen", "العودة لملء الشاشة")}
             </Button>
           </div>
         </div>

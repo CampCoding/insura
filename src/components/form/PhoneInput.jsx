@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { COUNTRIES, COUNTRY_BY_ISO } from "@/lib/countries";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 const MAX_VISIBLE = 60;
 
@@ -22,8 +23,10 @@ export default function PhoneInput({
   onChange,
   error,
   defaultCountry = "EG",
-  placeholder = "Phone number",
+  placeholder,
 }) {
+  const { t } = useLanguage();
+  const resolvedPlaceholder = placeholder ?? t("Phone number", "رقم الهاتف");
   const [iso, setIso] = useState(
     () => parseValue(value, defaultCountry).iso
   );
@@ -121,7 +124,7 @@ export default function PhoneInput({
           inputMode="numeric"
           value={digits}
           onChange={handleDigitsChange}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           className="w-full min-w-0 flex-1 bg-transparent px-3 py-2.5 text-base text-foreground outline-none placeholder:text-muted-foreground"
         />
 
@@ -133,11 +136,11 @@ export default function PhoneInput({
                 autoFocus
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search country"
+                placeholder={t("Search country", "ابحث عن دولة")}
                 className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
-            <div className="max-h-60 overflow-y-auto p-1.5">
+            <div className="custom-scrollbar max-h-60 overflow-y-auto p-1.5">
               {visibleCountries.map((c) => (
                 <button
                   key={c.iso}
@@ -158,12 +161,15 @@ export default function PhoneInput({
               ))}
               {filtered.length === 0 && (
                 <p className="px-3 py-4 text-center text-sm text-muted-foreground">
-                  No matches
+                  {t("No matches", "لا توجد نتائج")}
                 </p>
               )}
               {filtered.length > MAX_VISIBLE && (
                 <p className="px-3 pt-1 pb-0.5 text-center text-xs text-muted-foreground">
-                  Showing {MAX_VISIBLE} of {filtered.length}, keep typing to narrow down
+                  {t(
+                    `Showing ${MAX_VISIBLE} of ${filtered.length}, keep typing to narrow down`,
+                    `عرض ${MAX_VISIBLE} من ${filtered.length}، استمر بالكتابة لتضييق النتائج`
+                  )}
                 </p>
               )}
             </div>

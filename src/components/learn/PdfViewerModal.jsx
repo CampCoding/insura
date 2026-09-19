@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import CaptureGuardOverlay from "@/components/common/CaptureGuardOverlay";
 import { useAntiCaptureGuard } from "@/lib/useAntiCaptureGuard";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 export default function PdfViewerModal({ attachment, onClose }) {
+  const { t, tf } = useLanguage();
   const obscured = useAntiCaptureGuard(Boolean(attachment));
 
   useEffect(() => {
@@ -34,12 +36,12 @@ export default function PdfViewerModal({ attachment, onClose }) {
     <div className="fixed inset-0 z-50 flex flex-col bg-background">
       <div className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-3 sm:h-16 sm:gap-4 sm:px-5">
         <p className="min-w-0 truncate text-sm font-semibold text-foreground sm:text-base">
-          {attachment.title}
+          {tf(attachment.title)}
         </p>
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={t("Close", "إغلاق")}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-primary-tint hover:text-primary"
         >
           <X size={18} strokeWidth={1.75} />
@@ -52,7 +54,7 @@ export default function PdfViewerModal({ attachment, onClose }) {
       >
         <iframe
           src={viewerSrc}
-          title={attachment.title}
+          title={tf(attachment.title)}
           className="h-full w-full border-0"
         />
         <CaptureGuardOverlay show={obscured} />

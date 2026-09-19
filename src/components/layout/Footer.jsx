@@ -1,8 +1,11 @@
+"use client";
+
 import { SITE, buildWhatsAppLink } from "@/lib/site-data";
 import { Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import Container from "@/components/common/Container";
 import Logo from "./Logo";
+import { useLanguage } from "./LanguageProvider";
 
 const SOCIAL = [
   {
@@ -23,34 +26,42 @@ const SOCIAL = [
 ];
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="border-t border-border bg-surface">
       <Container className="grid gap-10 py-14 md:grid-cols-3">
         <div>
           <Logo imageClassName="h-10" />
           <p className="mt-3 max-w-xs text-sm leading-7 text-muted-foreground">
-            A training platform for medical rehabilitation, built with practical
-            content from practicing doctors and specialists.
+            {t(
+              "A training platform for medical rehabilitation, built with practical content from practicing doctors and specialists.",
+              "منصة تدريب في مجال إعادة التأهيل الطبي، تقدّم محتوى عمليًا من أطباء وأخصائيين يمارسون المهنة فعليًا."
+            )}
           </p>
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-foreground">Links</p>
+          <p className="text-sm font-semibold text-foreground">
+            {t("Links", "روابط")}
+          </p>
           <div className="mt-3 flex flex-col gap-2 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">
-              Home
+              {t("Home", "الرئيسية")}
             </Link>
             <Link href="/courses" className="hover:text-foreground">
-              Courses
+              {t("Courses", "الدورات")}
             </Link>
-            <Link href="/updates" className="hover:text-foreground">
-              Announcements
+            <Link href="/notifications" className="hover:text-foreground">
+              {t("Notifications", "الإشعارات")}
             </Link>
           </div>
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-foreground">Get in touch</p>
+          <p className="text-sm font-semibold text-foreground">
+            {t("Get in touch", "تواصل معنا")}
+          </p>
           <div className="mt-3 flex flex-col gap-2 text-sm text-muted-foreground">
             <a
               href={buildWhatsAppLink(
@@ -95,7 +106,7 @@ export default function Footer() {
         </div>
       </Container>
       <div className="border-t border-border px-4 py-5 text-center text-xs text-muted-foreground sm:px-6">
-        {SITE.name}. All rights reserved.
+        {SITE.name}. {t("All rights reserved.", "جميع الحقوق محفوظة.")}
       </div>
     </footer>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { buildWhatsAppLink } from "@/lib/site-data";
+import { buildWhatsAppLink, NOTIFICATIONS } from "@/lib/site-data";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Menu, X } from "lucide-react";
@@ -12,10 +12,29 @@ import CoursesDropdown from "./CoursesDropdown";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
 import ThemeToggle from "./ThemeToggle";
+import LanguageToggle from "./LanguageToggle";
+import { useLanguage } from "./LanguageProvider";
+import { useNotificationsRead } from "@/lib/useNotificationsRead";
 
 gsap.registerPlugin(ScrollTrigger);
 
+function NotificationsLabel({ label, unreadCount }) {
+  return (
+    <span className="relative inline-flex items-center">
+      {label}
+      {unreadCount > 0 && (
+        <span className="absolute -top-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground ring-2 ring-background rtl:-right-3.5 ltr:-right-3.5">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
+      )}
+    </span>
+  );
+}
+
 export default function Header() {
+  const { t } = useLanguage();
+  const { isRead } = useNotificationsRead();
+  const unreadCount = NOTIFICATIONS.filter((n) => !isRead(n.id)).length;
   const [open, setOpen] = useState(false);
   const barRef = useRef(null);
   const markRef = useRef(null);
@@ -52,20 +71,26 @@ export default function Header() {
           </div>
 
           <nav className="hidden items-center gap-2.5 lg:flex">
-            <NavLink href="/">Home</NavLink>
+            <NavLink href="/">{t("Home", "الرئيسية")}</NavLink>
             <CoursesDropdown />
-            <NavLink href="/updates">Announcements</NavLink>
-            <NavLink href="/my-courses">My Courses</NavLink>
+            <NavLink href="/notifications">
+              <NotificationsLabel
+                label={t("Notifications", "الإشعارات")}
+                unreadCount={unreadCount}
+              />
+            </NavLink>
+            <NavLink href="/my-courses">{t("My Courses", "دوراتي")}</NavLink>
           </nav>
         </div>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <LanguageToggle />
           <ThemeToggle />
           <Link
             href="/login"
             className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
           >
-            Log in
+            {t("Log in", "تسجيل الدخول")}
           </Link>
           <Button
             href={buildWhatsAppLink(
@@ -74,17 +99,18 @@ export default function Header() {
             fillColor="#25D366"
             className="!py-2.5 !px-5 whitespace-nowrap text-sm"
           >
-            Chat on WhatsApp
+            {t("Chat on WhatsApp", "تواصل عبر واتساب")}
           </Button>
         </div>
 
         <div className="flex items-center gap-1 lg:hidden">
+          <LanguageToggle />
           <ThemeToggle />
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             className="rounded-lg p-2 text-foreground"
-            aria-label="Toggle menu"
+            aria-label={t("Toggle menu", "تبديل القائمة")}
           >
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -95,19 +121,22 @@ export default function Header() {
         <nav className="border-t border-border px-4 pb-4 lg:hidden">
           <div className="flex flex-col gap-1 pt-2">
             <NavLink href="/" onClick={() => setOpen(false)} mobile>
-              Home
+              {t("Home", "الرئيسية")}
             </NavLink>
             <NavLink href="/courses" onClick={() => setOpen(false)} mobile>
-              Courses
+              {t("Courses", "الدورات")}
             </NavLink>
-            <NavLink href="/updates" onClick={() => setOpen(false)} mobile>
-              Announcements
+            <NavLink href="/notifications" onClick={() => setOpen(false)} mobile>
+              <NotificationsLabel
+                label={t("Notifications", "الإشعارات")}
+                unreadCount={unreadCount}
+              />
             </NavLink>
             <NavLink href="/my-courses" onClick={() => setOpen(false)} mobile>
-              My Courses
+              {t("My Courses", "كورساتي")}
             </NavLink>
             <NavLink href="/login" onClick={() => setOpen(false)} mobile>
-              Log in
+              {t("Log in", "تسجيل الدخول")}
             </NavLink>
           </div>
           <Button
@@ -117,7 +146,7 @@ export default function Header() {
             fillColor="#25D366"
             className="mt-3 w-full text-sm"
           >
-            Chat on WhatsApp
+            {t("Chat on WhatsApp", "تواصل عبر واتساب")}
           </Button>
         </nav>
       )}

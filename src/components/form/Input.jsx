@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 
 export default function Input({
   label,
@@ -11,6 +12,7 @@ export default function Input({
   className = "",
   ...props
 }) {
+  const { t } = useLanguage();
   const generatedId = useId();
   const inputId = id || generatedId;
   const [showPassword, setShowPassword] = useState(false);
@@ -45,7 +47,11 @@ export default function Input({
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             tabIndex={-1}
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-label={
+              showPassword
+                ? t("Hide password", "إخفاء كلمة المرور")
+                : t("Show password", "إظهار كلمة المرور")
+            }
             className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-primary"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

@@ -5,10 +5,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ReviewCard from "./ReviewCard";
+import { useLanguage } from "@/components/layout/LanguageProvider";
 import "swiper/css";
 import "swiper/css/navigation";
 
 export default function ReviewSwiper({ reviews }) {
+  const { t } = useLanguage();
   const [prevEl, setPrevEl] = useState(null);
   const [nextEl, setNextEl] = useState(null);
 
@@ -34,7 +36,7 @@ export default function ReviewSwiper({ reviews }) {
         <button
           ref={setPrevEl}
           type="button"
-          aria-label="Previous review"
+          aria-label={t("Previous review", "التقييم السابق")}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           <ChevronLeft size={18} />
@@ -43,7 +45,7 @@ export default function ReviewSwiper({ reviews }) {
         <button
           ref={setNextEl}
           type="button"
-          aria-label="Next review"
+          aria-label={t("Next review", "التقييم التالي")}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
           <ChevronRight size={18} />

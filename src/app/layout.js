@@ -1,6 +1,7 @@
-import { Geist, Geist_Mono, EB_Garamond } from "next/font/google";
+import { Geist, Geist_Mono, EB_Garamond, Cairo } from "next/font/google";
 import SiteChrome from "@/components/layout/SiteChrome";
 import ThemeSync from "@/components/layout/ThemeSync";
+import { LanguageProvider } from "@/components/layout/LanguageProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,6 +20,12 @@ const displayFont = EB_Garamond({
   weight: ["500", "600", "700"],
 });
 
+const arabicFont = Cairo({
+  variable: "--font-arabic",
+  subsets: ["arabic", "latin"],
+  weight: ["500", "600", "700"],
+});
+
 export const metadata = {
   metadataBase: new URL("https://insura.example"), // TODO: replace with the real production domain
   title: "Insura | Medical Rehabilitation Courses",
@@ -31,18 +38,20 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} ${arabicFont.variable} h-full antialiased`}
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('insura-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('insura-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}var l=localStorage.getItem('insura-lang');if(l==='ar'){document.documentElement.lang='ar';document.documentElement.dir='rtl';}}catch(e){}})();`,
           }}
         />
       </head>
       <body className="min-h-full flex flex-col font-sans">
-        <ThemeSync />
-        <SiteChrome>{children}</SiteChrome>
+        <LanguageProvider>
+          <ThemeSync />
+          <SiteChrome>{children}</SiteChrome>
+        </LanguageProvider>
       </body>
     </html>
   );

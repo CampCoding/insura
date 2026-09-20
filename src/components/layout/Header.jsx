@@ -1,20 +1,20 @@
 "use client";
 
+import Button from "@/components/common/Button";
+import Container from "@/components/common/Container";
 import { buildWhatsAppLink, NOTIFICATIONS } from "@/lib/site-data";
+import { useNotificationsRead } from "@/lib/useNotificationsRead";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useLayoutEffect, useRef, useState } from "react";
-import Button from "@/components/common/Button";
-import Container from "@/components/common/Container";
 import CoursesDropdown from "./CoursesDropdown";
+import { useLanguage } from "./LanguageProvider";
+import LanguageToggle from "./LanguageToggle";
 import Logo from "./Logo";
 import NavLink from "./NavLink";
 import ThemeToggle from "./ThemeToggle";
-import LanguageToggle from "./LanguageToggle";
-import { useLanguage } from "./LanguageProvider";
-import { useNotificationsRead } from "@/lib/useNotificationsRead";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,7 +23,7 @@ function NotificationsLabel({ label, unreadCount }) {
     <span className="relative inline-flex items-center">
       {label}
       {unreadCount > 0 && (
-        <span className="absolute -top-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground ring-2 ring-background rtl:-right-3.5 ltr:-right-3.5">
+        <span className="absolute -top-2.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white! ring-2 ring-background rtl:-right-3.5 ltr:-right-3.5">
           {unreadCount > 9 ? "9+" : unreadCount}
         </span>
       )}
@@ -84,8 +84,8 @@ export default function Header() {
         </div>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <LanguageToggle />
           <ThemeToggle />
+          <LanguageToggle />
           <Link
             href="/login"
             className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
@@ -126,7 +126,11 @@ export default function Header() {
             <NavLink href="/courses" onClick={() => setOpen(false)} mobile>
               {t("Courses", "الدورات")}
             </NavLink>
-            <NavLink href="/notifications" onClick={() => setOpen(false)} mobile>
+            <NavLink
+              href="/notifications"
+              onClick={() => setOpen(false)}
+              mobile
+            >
               <NotificationsLabel
                 label={t("Notifications", "الإشعارات")}
                 unreadCount={unreadCount}

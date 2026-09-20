@@ -306,7 +306,7 @@ export default function ExamView({ course }) {
                           <span className="h-2.5 w-2.5 rounded-full bg-primary" />
                         )}
                       </span>
-                      <span>{option}</span>
+                      <span className="whitespace-pre-wrap">{option}</span>
                     </button>
                   );
                 })}

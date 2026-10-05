@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
@@ -19,7 +19,8 @@ import ThemeToggle from "@/components/layout/ThemeToggle";
 import LanguageToggle from "@/components/layout/LanguageToggle";
 import { useLanguage } from "@/components/layout/LanguageProvider";
 import { useAntiCaptureGuard } from "@/lib/useAntiCaptureGuard";
-import { useEnrollment } from "@/lib/useEnrollment";
+import { useCourse } from "@/lib/useCourses";
+import { useExam } from "@/lib/useExam";
 
 function ExamQuestionMarker({ index, isCurrent, isAnswered, isMarked, onClick }) {
   const stateClasses = isAnswered
@@ -44,12 +45,15 @@ function ExamQuestionMarker({ index, isCurrent, isAnswered, isMarked, onClick })
   );
 }
 
-export default function ExamView({ course }) {
-  const { t, tf, lang } = useLanguage();
+export default function ExamView({ slug }) {
+  const { t, lang } = useLanguage();
   const router = useRouter();
   const rootRef = useRef(null);
-  const { ready, enrolled } = useEnrollment(course.slug);
-  const questions = course.exam.questions;
+  const { ready: courseReady, course } = useCourse(slug);
+  const { ready: examReady, exam, submit } = useExam(slug);
+  const ready = courseReady && examReady;
+  const enrolled = Boolean(course?.isEnrolled);
+  const questions = exam?.questions ?? [];
 
   const [stage, setStage] = useState("intro");
   const [examLang, setExamLang] = useState(null);
@@ -68,24 +72,25 @@ export default function ExamView({ course }) {
   const [marked, setMarked] = useState(() => new Set());
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasEnteredFullscreen, setHasEnteredFullscreen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [result, setResult] = useState(null);
   const obscured = useAntiCaptureGuard(stage === "exam");
 
   const question = questions[currentIndex];
   const isLast = currentIndex === questions.length - 1;
-  const score = useMemo(
-    () =>
-      answers.reduce(
-        (sum, answer, i) => (answer === questions[i].correctIndex ? sum + 1 : sum),
-        0
-      ),
-    [answers, questions]
-  );
+
+  useEffect(() => {
+    // Answers are sized to however many questions just loaded.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAnswers(Array(questions.length).fill(null));
+  }, [questions.length]);
 
   useEffect(() => {
     if (ready && !enrolled) {
-      router.replace(`/courses/${course.slug}`);
+      router.replace(`/courses/${slug}`);
     }
-  }, [ready, enrolled, course.slug, router]);
+  }, [ready, enrolled, slug, router]);
 
   useEffect(() => {
     function handleChange() {
@@ -135,14 +140,28 @@ export default function ExamView({ course }) {
     });
   };
 
-  const handleSubmit = () => {
-    setStage("result");
-    if (document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
+  const handleSubmit = async () => {
+    setSubmitError("");
+    setSubmitting(true);
+    try {
+      const payload = questions.map((q, i) => ({
+        question_id: q.question_id,
+        selectedIndex: answers[i],
+      }));
+      const data = await submit(payload);
+      setResult(data);
+      setStage("result");
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  if (!ready || !enrolled) return null;
+  if (!ready || !enrolled || !exam) return null;
 
   return (
     <div
@@ -153,10 +172,10 @@ export default function ExamView({ course }) {
       <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border bg-surface px-5">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-foreground">
-            {TF(course.exam.title)}
+            {TF(exam.title)}
           </p>
           <p className="truncate text-xs text-muted-foreground">
-            {TF(course.exam.subject)}
+            {TF(exam.subject)}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
@@ -172,12 +191,22 @@ export default function ExamView({ course }) {
               <ClipboardList size={28} strokeWidth={1.75} />
             </div>
             <h1 className="text-2xl font-semibold text-foreground sm:text-3xl md:text-4xl">
-              {TF(course.exam.title)}
+              {TF(exam.title)}
             </h1>
             <p className="text-muted-foreground">
-              {TF(course.exam.subject)} ·{" "}
+              {TF(exam.subject)} ·{" "}
               {T(`${questions.length} questions`, `${questions.length} أسئلة`)}
             </p>
+
+            {exam.previousResult && (
+              <p className="rounded-full bg-primary-tint px-4 py-1.5 text-sm text-primary">
+                {T(
+                  `You previously scored ${exam.previousResult.score}/${exam.previousResult.total} (${exam.previousResult.percent}%). Submitting again replaces that result.`,
+                  `نتيجتك السابقة كانت ${exam.previousResult.score}/${exam.previousResult.total} (${exam.previousResult.percent}%). التسليم مجددًا يستبدل هذه النتيجة.`
+                )}
+              </p>
+            )}
+
             <ul className="flex w-full max-w-md flex-col gap-2 text-left text-sm text-muted-foreground">
               <li>
                 {T(
@@ -251,7 +280,7 @@ export default function ExamView({ course }) {
         </div>
       )}
 
-      {stage === "exam" && (
+      {stage === "exam" && question && (
         <div
           onContextMenu={(event) => event.preventDefault()}
           className="relative isolate flex flex-1 select-none flex-col overflow-hidden sm:flex-row"
@@ -312,6 +341,10 @@ export default function ExamView({ course }) {
                 })}
               </div>
 
+              {submitError && (
+                <p className="text-sm text-danger text-red-600">{submitError}</p>
+              )}
+
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
                 <button
                   type="button"
@@ -340,8 +373,10 @@ export default function ExamView({ course }) {
                   </Button>
 
                   {isLast ? (
-                    <Button onClick={handleSubmit}>
-                      {T("Submit Exam", "تسليم الاختبار")}
+                    <Button onClick={handleSubmit} disabled={submitting}>
+                      {submitting
+                        ? T("Submitting...", "جارٍ التسليم...")
+                        : T("Submit Exam", "تسليم الاختبار")}
                     </Button>
                   ) : (
                     <Button
@@ -362,7 +397,7 @@ export default function ExamView({ course }) {
         </div>
       )}
 
-      {stage === "result" && (
+      {stage === "result" && result && (
         <div className="flex flex-1 items-start justify-center overflow-y-auto px-4 py-10 sm:px-6 sm:py-12">
           <div className="flex w-full max-w-2xl flex-col items-center gap-5 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-tint text-primary">
@@ -370,12 +405,12 @@ export default function ExamView({ course }) {
             </div>
             <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
               {T(
-                `You scored ${score}/${questions.length}`,
-                `نتيجتك ${score}/${questions.length}`
+                `You scored ${result.score}/${result.total}`,
+                `نتيجتك ${result.score}/${result.total}`
               )}
             </h2>
             <p className="text-muted-foreground">
-              {score >= Math.ceil(questions.length * 0.6)
+              {result.passed
                 ? T(
                     "Great job — you passed the assessment.",
                     "أحسنت — لقد اجتزت الاختبار."
@@ -387,21 +422,21 @@ export default function ExamView({ course }) {
             </p>
 
             <div className="mt-3 flex w-full flex-col gap-2 text-left">
-              {questions.map((q, i) => {
-                const isCorrect = answers[i] === q.correctIndex;
+              {result.review.map((item, i) => {
+                const q = questions.find((qq) => qq.question_id === item.question_id);
                 return (
                   <div
-                    key={q.question.en}
+                    key={item.question_id}
                     className={`flex items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm ${
-                      isCorrect
+                      item.isCorrect
                         ? "border-border"
                         : "border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-950/20"
                     }`}
                   >
                     <span className="min-w-0 flex-1 text-foreground">
-                      {i + 1}. {TF(q.question)}
+                      {i + 1}. {q ? TF(q.question) : ""}
                     </span>
-                    {isCorrect ? (
+                    {item.isCorrect ? (
                       <CheckCircle2
                         size={18}
                         className="shrink-0 text-primary"
@@ -419,7 +454,7 @@ export default function ExamView({ course }) {
               })}
             </div>
 
-            <Button href={`/learn/${course.slug}`} className="mt-4">
+            <Button href={`/learn/${slug}`} className="mt-4">
               {T("Back to course", "العودة للدورة")}
             </Button>
           </div>

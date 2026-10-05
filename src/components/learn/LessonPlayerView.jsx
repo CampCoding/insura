@@ -7,9 +7,11 @@ import { useLanguage } from "@/components/layout/LanguageProvider";
 import LanguageToggle from "@/components/layout/LanguageToggle";
 import Logo from "@/components/layout/Logo";
 import ThemeToggle from "@/components/layout/ThemeToggle";
-import { formatMinutes, getFlatLessons, unsplashUrl } from "@/lib/site-data";
+import { formatMinutes } from "@/lib/site-data";
 import { useAntiCaptureGuard } from "@/lib/useAntiCaptureGuard";
-import { useEnrollment } from "@/lib/useEnrollment";
+import { useAuth } from "@/lib/useAuth";
+import { useCourse } from "@/lib/useCourses";
+import { useProgress } from "@/lib/useProgress";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,12 +25,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useState } from "react";
 import LessonNotesPanel from "./LessonNotesPanel";
+import VimeoPlayer from "./VimeoPlayer";
 
 function sectionMinutes(section) {
   return section.lessons.reduce((sum, item) => sum + item.minutes, 0);
 }
 
-export default function LessonPlayerView({ course, lesson }) {
+export default function LessonPlayerView({ slug, lessonKey }) {
   const { t, tf, lang } = useLanguage();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -41,36 +44,38 @@ export default function LessonPlayerView({ course, lesson }) {
     }
   }, []);
 
-  const { ready, enrolled, completed, markLessonComplete } = useEnrollment(
-    course.slug,
-  );
-  const flatLessons = getFlatLessons(course);
-  const totalLessons = flatLessons.length;
-  const currentIndex = flatLessons.findIndex((l) => l.key === lesson.key);
+  const { ready: authReady } = useAuth();
+  const { ready: courseReady, course } = useCourse(slug);
+  const { ready: progressReady, progress, markComplete } = useProgress(slug);
+
+  const ready = authReady && courseReady && progressReady;
+  const enrolled = Boolean(course?.isEnrolled);
+  const curriculum = progress?.curriculum ?? course?.curriculum ?? [];
+  const flatLessons = curriculum.flatMap((section) => section.lessons);
+  const lesson = flatLessons.find((item) => item.key === lessonKey);
+  const currentIndex = flatLessons.findIndex((item) => item.key === lessonKey);
   const prevLesson = flatLessons[currentIndex - 1];
   const nextLesson = flatLessons[currentIndex + 1];
-  const locked = !lesson.preview && !enrolled;
-  const progressPercent = totalLessons
-    ? Math.round((completed.length / totalLessons) * 100)
-    : 0;
+  const locked = !ready || !lesson || (!lesson.preview && !enrolled);
+  const progressPercent = progress?.percent ?? 0;
   const obscured = useAntiCaptureGuard(true);
 
   useEffect(() => {
     if (ready && locked) {
-      router.replace(`/courses/${course.slug}`);
+      router.replace(`/courses/${slug}`);
     }
-  }, [ready, locked, course.slug, router]);
+  }, [ready, locked, slug, router]);
 
-  const handleCompleteAndContinue = () => {
-    markLessonComplete(lesson.key);
+  const handleCompleteAndContinue = async () => {
+    await markComplete(lessonKey);
     if (nextLesson) {
-      router.push(`/learn/${course.slug}/${nextLesson.key}`);
+      router.push(`/learn/${slug}/${nextLesson.key}`);
     } else {
-      router.push(`/learn/${course.slug}`);
+      router.push(`/learn/${slug}`);
     }
   };
 
-  if (!ready || locked) return null;
+  if (!ready || locked || !course || !lesson) return null;
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background">
@@ -126,9 +131,7 @@ export default function LessonPlayerView({ course, lesson }) {
           <span className="mx-0.5 h-6 w-px shrink-0 bg-border md:mx-1" />
           <Button
             variant="outline"
-            href={
-              prevLesson ? `/learn/${course.slug}/${prevLesson.key}` : undefined
-            }
+            href={prevLesson ? `/learn/${slug}/${prevLesson.key}` : undefined}
             aria-label={t("Previous lesson", "الدرس السابق")}
             className={`!px-2 !py-2 text-sm md:!px-4 ${
               !prevLesson ? "pointer-events-none opacity-40" : ""
@@ -153,7 +156,7 @@ export default function LessonPlayerView({ course, lesson }) {
             </Button>
           ) : (
             <Button
-              href={`/courses/${course.slug}`}
+              href={`/courses/${slug}`}
               className="!px-2 !py-2 text-sm md:!px-4"
             >
               {t("Back to course", "العودة للدورة")}
@@ -204,8 +207,8 @@ export default function LessonPlayerView({ course, lesson }) {
             </div>
 
             <div className="custom-scrollbar flex-1 overflow-y-auto py-3">
-              {course.curriculum.map((section, sectionIndex) => (
-                <div key={section.title.en} className="mb-4">
+              {curriculum.map((section, sectionIndex) => (
+                <div key={section.section_id ?? section.title.en} className="mb-4">
                   <p className="border-b-2 border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground">
                     {tf(section.title)}{" "}
                     <span className="font-normal text-muted-foreground">
@@ -214,10 +217,10 @@ export default function LessonPlayerView({ course, lesson }) {
                   </p>
                   <ul className="flex flex-col divide-y divide-border px-3 pt-1">
                     {section.lessons.map((item, lessonIndex) => {
-                      const key = `${sectionIndex}-${lessonIndex}`;
-                      const isDone = completed.includes(key);
-                      const isCurrent = key === lesson.key;
-                      const itemLocked = !item.preview && !enrolled;
+                      const key = item.key ?? `${sectionIndex}-${lessonIndex}`;
+                      const isDone = Boolean(item.watched);
+                      const isCurrent = key === lessonKey;
+                      const itemLocked = !enrolled && !item.preview;
                       const markerState = isDone
                         ? "done"
                         : itemLocked
@@ -246,7 +249,7 @@ export default function LessonPlayerView({ course, lesson }) {
                       if (itemLocked) {
                         return (
                           <li
-                            key={item.title.en}
+                            key={key}
                             className="flex items-center gap-2.5 rounded-lg px-2 py-2.5 text-muted-foreground"
                           >
                             {content}
@@ -255,9 +258,9 @@ export default function LessonPlayerView({ course, lesson }) {
                       }
 
                       return (
-                        <li key={item.title.en}>
+                        <li key={key}>
                           <Link
-                            href={`/learn/${course.slug}/${key}`}
+                            href={`/learn/${slug}/${key}`}
                             className={`flex items-center gap-2.5 rounded-lg px-2 py-2.5 transition-colors ${
                               isCurrent
                                 ? "bg-primary-tint text-primary"
@@ -306,7 +309,7 @@ export default function LessonPlayerView({ course, lesson }) {
                     )}
                   </span>
                   <Link
-                    href={`/courses/${course.slug}`}
+                    href={`/courses/${slug}`}
                     className="font-medium underline underline-offset-2"
                   >
                     {t(
@@ -333,27 +336,19 @@ export default function LessonPlayerView({ course, lesson }) {
               <div
                 onContextMenu={(event) => event.preventDefault()}
                 className={`relative isolate select-none overflow-hidden rounded-card bg-foreground ${
-                  notesOpen ? "max-xl:h-[30vh] max-xl:shrink-0" : ""
+                  notesOpen ? "max-xl:h-[30vh] max-xl:shrink-0" : "aspect-video w-full"
                 }`}
               >
-                <video
-                  key={lesson.key}
-                  controls
-                  controlsList="nodownload noremoteplayback"
-                  disablePictureInPicture
-                  onContextMenu={(event) => event.preventDefault()}
-                  poster={unsplashUrl(course.image, 1280, 720)}
+                <VimeoPlayer
+                  key={lessonKey}
+                  videoUrl={lesson.videoUrl}
+                  title={tf(lesson.title)}
                   className={
                     notesOpen
-                      ? "h-full w-full object-contain xl:aspect-video xl:h-auto"
-                      : "aspect-video w-full"
+                      ? "h-full w-full xl:aspect-video xl:h-auto"
+                      : "absolute inset-0 h-full w-full"
                   }
-                >
-                  <source
-                    src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                    type="video/mp4"
-                  />
-                </video>
+                />
                 <CaptureGuardOverlay show={obscured} />
               </div>
             </div>
@@ -362,8 +357,8 @@ export default function LessonPlayerView({ course, lesson }) {
               <div className="shrink-0 max-xl:min-h-0 max-xl:flex-1 xl:w-96">
                 <div className="h-full overflow-hidden rounded-card border border-border shadow-sm xl:sticky xl:top-6 xl:h-[calc(100dvh-8rem)]">
                   <LessonNotesPanel
-                    courseSlug={course.slug}
-                    lessonKey={lesson.key}
+                    courseSlug={slug}
+                    lessonKey={lessonKey}
                     lessonTitle={tf(lesson.title)}
                     onClose={() => setNotesOpen(false)}
                     className="h-full"

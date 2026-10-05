@@ -6,11 +6,21 @@ import PhoneInput from "@/components/form/PhoneInput";
 import Button from "@/components/common/Button";
 import Logo from "@/components/layout/Logo";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLanguage } from "@/components/layout/LanguageProvider";
+import { registerUser } from "@/lib/auth";
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 export default function RegisterPage() {
   const { t } = useLanguage();
+  const router = useRouter();
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState(null);
   const [email, setEmail] = useState("");
@@ -18,14 +28,31 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError(t("Passwords don't match.", "كلمتا المرور غير متطابقتين."));
       return;
     }
     setError("");
+    setLoading(true);
+    try {
+      await registerUser({
+        name,
+        birthdate: birthdate ? formatDate(birthdate) : "",
+        email,
+        phone: phone ?? "",
+        password,
+        confirmPassword,
+      });
+      router.push("/login?registered=1");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,8 +122,10 @@ export default function RegisterPage() {
             />
           </div>
 
-          <Button type="submit" className="mt-2 w-full">
-            {t("Create account", "إنشاء الحساب")}
+          <Button type="submit" disabled={loading} className="mt-2 w-full">
+            {loading
+              ? t("Creating account...", "جارٍ إنشاء الحساب...")
+              : t("Create account", "إنشاء الحساب")}
           </Button>
         </form>
 

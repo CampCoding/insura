@@ -1,5 +1,4 @@
 import CoursesListView from "@/components/course/CoursesListView";
-import { COURSES } from "@/lib/site-data";
 
 export const metadata = {
   title: "Courses | Insura",
@@ -7,5 +6,5 @@ export const metadata = {
 };
 
 export default function CoursesPage() {
-  return <CoursesListView courses={COURSES} />;
+  return <CoursesListView />;
 }

@@ -8,11 +8,13 @@ import Link from "next/link";
 import { buildWhatsAppLink, unsplashUrl } from "@/lib/site-data";
 import SplitWords from "@/components/common/SplitWords";
 import { useLanguage } from "@/components/layout/LanguageProvider";
+import { useSettings } from "@/components/layout/SettingsProvider";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
   const sectionRef = useRef(null);
   const imageRef = useRef(null);
   const subtextRef = useRef(null);
@@ -107,7 +109,8 @@ export default function Hero() {
         >
           <Link
             href={buildWhatsAppLink(
-              "Hi, I'd like to know more about the courses"
+              "Hi, I'd like to know more about the courses",
+              settings.whatsappNumber
             )}
             target="_blank"
             rel="noopener noreferrer"

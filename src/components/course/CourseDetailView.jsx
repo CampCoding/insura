@@ -16,12 +16,39 @@ import IncludeCard from "@/components/course/IncludeCard";
 import CourseCurriculum from "@/components/course/CourseCurriculum";
 import ReviewSwiper from "@/components/course/ReviewSwiper";
 import Reveal from "@/components/common/Reveal";
-import { buildWhatsAppLink, getCourseStats, unsplashUrl } from "@/lib/site-data";
+import { buildWhatsAppLink, formatMinutes } from "@/lib/site-data";
 import { useLanguage } from "@/components/layout/LanguageProvider";
+import { useSettings } from "@/components/layout/SettingsProvider";
+import { useCourse } from "@/lib/useCourses";
 
-export default function CourseDetailView({ course }) {
+export default function CourseDetailView({ slug }) {
   const { t, tf, lang } = useLanguage();
-  const stats = getCourseStats(course, lang);
+  const { settings } = useSettings();
+  const { ready, course, error } = useCourse(slug);
+
+  if (!ready) {
+    return (
+      <Container as="section" className="py-16">
+        <p className="text-sm text-muted-foreground">{t("Loading...", "جارٍ التحميل...")}</p>
+      </Container>
+    );
+  }
+
+  if (error || !course) {
+    return (
+      <Container as="section" className="py-16">
+        <p className="text-sm text-muted-foreground">
+          {t("This course could not be found.", "هذه الدورة غير موجودة.")}
+        </p>
+      </Container>
+    );
+  }
+
+  const stats = {
+    sections: course.stats.sections,
+    lessons: course.stats.lessons,
+    duration: formatMinutes(course.stats.minutes, lang),
+  };
 
   const includes = [
     {
@@ -47,7 +74,8 @@ export default function CourseDetailView({ course }) {
   ];
 
   const whatsappHref = buildWhatsAppLink(
-    `Hi, I'd like to subscribe to the "${course.title.en}" course.`
+    `Hi, I'd like to subscribe to the "${course.title.en}" course.`,
+    settings.whatsappNumber
   );
 
   return (
@@ -69,14 +97,18 @@ export default function CourseDetailView({ course }) {
             <span className="text-xl font-semibold text-primary sm:text-2xl">
               {tf(course.price)}
             </span>
-            <CourseEnrollActions slug={course.slug} whatsappHref={whatsappHref} />
+            <CourseEnrollActions
+              slug={course.slug}
+              isEnrolled={course.isEnrolled}
+              whatsappHref={whatsappHref}
+            />
           </div>
         </Reveal>
 
         <Reveal delay={120}>
           <div className="relative aspect-4/3 overflow-hidden rounded-card">
             <Image
-              src={unsplashUrl(course.image, 900, 700)}
+              src={course.image}
               alt={tf(course.title)}
               fill
               priority
@@ -132,7 +164,11 @@ export default function CourseDetailView({ course }) {
             </Reveal>
 
             <Reveal delay={120} className="mt-6">
-              <CourseCurriculum slug={course.slug} curriculum={course.curriculum} />
+              <CourseCurriculum
+                slug={course.slug}
+                curriculum={course.curriculum}
+                isEnrolled={course.isEnrolled}
+              />
             </Reveal>
           </div>
 
@@ -148,6 +184,7 @@ export default function CourseDetailView({ course }) {
               <div className="mt-5">
                 <CourseEnrollActions
                   slug={course.slug}
+                  isEnrolled={course.isEnrolled}
                   whatsappHref={whatsappHref}
                   fullWidth
                 />
@@ -174,7 +211,7 @@ export default function CourseDetailView({ course }) {
           <Reveal className="shrink-0">
             <div className="relative h-28 w-28 overflow-hidden rounded-full">
               <Image
-                src={unsplashUrl(course.instructor.image, 300, 300)}
+                src={course.instructor.image}
                 alt={course.instructor.name}
                 fill
                 sizes="112px"
@@ -215,7 +252,11 @@ export default function CourseDetailView({ course }) {
               `جاهز للبدء؟ اشترك الآن مقابل ${tf(course.price)}.`
             )}
           </p>
-          <CourseEnrollActions slug={course.slug} whatsappHref={whatsappHref} />
+          <CourseEnrollActions
+            slug={course.slug}
+            isEnrolled={course.isEnrolled}
+            whatsappHref={whatsappHref}
+          />
         </Reveal>
       </Container>
     </>

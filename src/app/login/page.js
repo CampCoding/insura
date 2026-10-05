@@ -4,16 +4,39 @@ import Input from "@/components/form/Input";
 import Button from "@/components/common/Button";
 import Logo from "@/components/layout/Logo";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/layout/LanguageProvider";
+import { loginUser } from "@/lib/auth";
 
 export default function LoginPage() {
   const { t } = useLanguage();
+  const router = useRouter();
+  const [justRegistered, setJustRegistered] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Avoids useSearchParams()'s Suspense-boundary requirement for a single
+    // one-off flag read on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setJustRegistered(new URLSearchParams(window.location.search).get("registered") === "1");
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await loginUser({ email, password });
+      router.push("/my-courses");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,6 +50,15 @@ export default function LoginPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           {t("Welcome back, log in to continue.", "أهلًا بعودتك، سجّل الدخول للمتابعة.")}
         </p>
+
+        {justRegistered && (
+          <p className="mt-4 rounded-control border border-green-200 bg-green-50 px-4 py-2.5 text-sm text-green-700">
+            {t(
+              "Account created. Log in to continue.",
+              "تم إنشاء الحساب بنجاح. سجّل الدخول للمتابعة."
+            )}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <Input
@@ -44,11 +76,12 @@ export default function LoginPage() {
             placeholder={t("Your password", "كلمة المرور الخاصة بك")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            error={error}
             required
           />
 
-          <Button type="submit" className="mt-2 w-full">
-            {t("Log in", "تسجيل الدخول")}
+          <Button type="submit" disabled={loading} className="mt-2 w-full">
+            {loading ? t("Logging in...", "جارٍ تسجيل الدخول...") : t("Log in", "تسجيل الدخول")}
           </Button>
         </form>
 

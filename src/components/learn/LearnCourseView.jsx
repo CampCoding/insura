@@ -3,8 +3,9 @@
 import Button from "@/components/common/Button";
 import Container from "@/components/common/Container";
 import CourseCurriculum from "@/components/course/CourseCurriculum";
-import { getCourseStats, getFlatLessons, unsplashUrl } from "@/lib/site-data";
-import { useEnrollment } from "@/lib/useEnrollment";
+import { useAuth } from "@/lib/useAuth";
+import { useCourse } from "@/lib/useCourses";
+import { useProgress } from "@/lib/useProgress";
 import { ChevronRight, ClipboardList, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,29 +30,32 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
-export default function LearnCourseView({ course }) {
-  const { t, tf, lang } = useLanguage();
+export default function LearnCourseView({ slug }) {
+  const { t, tf } = useLanguage();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("content");
   const [openAttachment, setOpenAttachment] = useState(null);
-  const { ready, enrolled, completed } = useEnrollment(course.slug);
-  const stats = getCourseStats(course, lang);
-  const flatLessons = getFlatLessons(course);
-  const totalLessons = flatLessons.length;
-  const progressPercent = totalLessons
-    ? Math.round((completed.length / totalLessons) * 100)
-    : 0;
-  const nextLesson =
-    flatLessons.find((lesson) => !completed.includes(lesson.key)) ??
-    flatLessons[0];
+  const { ready: authReady } = useAuth();
+  const { ready: courseReady, course } = useCourse(slug);
+  const { ready: progressReady, progress } = useProgress(slug);
+
+  const ready = authReady && courseReady && progressReady;
+  const enrolled = Boolean(course?.isEnrolled);
 
   useEffect(() => {
     if (ready && !enrolled) {
-      router.replace(`/courses/${course.slug}`);
+      router.replace(`/courses/${slug}`);
     }
-  }, [ready, enrolled, course.slug, router]);
+  }, [ready, enrolled, slug, router]);
 
-  if (!ready || !enrolled) return null;
+  if (!ready || !enrolled || !course) return null;
+
+  const curriculum = progress?.curriculum ?? course.curriculum;
+  const flatLessons = curriculum.flatMap((section) => section.lessons);
+  const totalLessons = progress?.lessonsTotal ?? flatLessons.length;
+  const completedCount = progress?.lessonsWatched ?? 0;
+  const progressPercent = progress?.percent ?? 0;
+  const nextLesson = flatLessons.find((lesson) => !lesson.watched) ?? flatLessons[0];
 
   return (
     <Container as="section" className="py-12">
@@ -62,7 +66,7 @@ export default function LearnCourseView({ course }) {
       <div className="mt-8 flex flex-col gap-8 rounded-card border border-border bg-surface p-6 lg:flex-row lg:items-center lg:gap-10 lg:p-8">
         <div className="w-full overflow-hidden rounded-card lg:w-[440px] lg:shrink-0">
           <Image
-            src={unsplashUrl(course.image, 800, 600)}
+            src={course.image}
             alt={tf(course.title)}
             width={800}
             height={600}
@@ -73,16 +77,16 @@ export default function LearnCourseView({ course }) {
         <div className="flex flex-col items-start gap-4">
           <p className="text-base text-muted-foreground">
             {t(
-              `${stats.sections} sections · ${completed.length}/${totalLessons} lessons complete`,
-              `${stats.sections} أقسام · ${completed.length}/${totalLessons} دروس مكتملة`
+              `${course.stats.sections} sections · ${completedCount}/${totalLessons} lessons complete`,
+              `${course.stats.sections} أقسام · ${completedCount}/${totalLessons} دروس مكتملة`
             )}
           </p>
           <p className="text-xl font-semibold text-foreground sm:text-2xl md:text-[1.75rem]">
             {nextLesson ? tf(nextLesson.title) : t("Course complete", "الدورة مكتملة")}
           </p>
           {nextLesson && (
-            <Button href={`/learn/${course.slug}/${nextLesson.key}`}>
-              {completed.length
+            <Button href={`/learn/${slug}/${nextLesson.key}`}>
+              {completedCount
                 ? t("Continue lesson", "متابعة الدرس")
                 : t("Start lesson", "ابدأ الدرس")}
             </Button>
@@ -119,10 +123,7 @@ export default function LearnCourseView({ course }) {
 
           <div className="mt-5">
             {activeTab === "content" && (
-              <CourseCurriculum
-                slug={course.slug}
-                curriculum={course.curriculum}
-              />
+              <CourseCurriculum slug={slug} curriculum={curriculum} isEnrolled />
             )}
 
             {activeTab === "exam" && (
@@ -136,12 +137,12 @@ export default function LearnCourseView({ course }) {
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {t(
-                      `${course.exam.questions.length} questions · test what you've learned across the full course.`,
-                      `${course.exam.questions.length} أسئلة · اختبر ما تعلمته على مدار الدورة كاملة.`
+                      `${course.exam.questions} questions · test what you've learned across the full course.`,
+                      `${course.exam.questions} أسئلة · اختبر ما تعلمته على مدار الدورة كاملة.`
                     )}
                   </p>
                 </div>
-                <Button href={`/learn/${course.slug}/exam`}>
+                <Button href={`/learn/${slug}/exam`}>
                   {t("Start Exam", "ابدأ الاختبار")}
                 </Button>
               </div>
@@ -151,7 +152,7 @@ export default function LearnCourseView({ course }) {
               <div className="flex flex-col gap-3">
                 {course.attachments.map((attachment) => (
                   <button
-                    key={attachment.title.en}
+                    key={attachment.attachment_id ?? attachment.title.en}
                     type="button"
                     onClick={() => setOpenAttachment(attachment)}
                     className="flex items-center gap-3 rounded-card border border-border bg-surface p-4 text-left transition-colors hover:border-primary/40 sm:gap-4 sm:p-5"
@@ -199,7 +200,7 @@ export default function LearnCourseView({ course }) {
             <div className="flex items-center gap-4">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full">
                 <Image
-                  src={unsplashUrl(course.instructor.image, 200, 200)}
+                  src={course.instructor.image}
                   alt={course.instructor.name}
                   fill
                   sizes="64px"
@@ -218,7 +219,7 @@ export default function LearnCourseView({ course }) {
           </div>
 
           <Link
-            href={`/courses/${course.slug}`}
+            href={`/courses/${slug}`}
             className="text-center text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
           >
             {t("Back to course details", "العودة لتفاصيل الدورة")}

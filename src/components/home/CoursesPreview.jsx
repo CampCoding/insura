@@ -5,12 +5,15 @@ import Container from "@/components/common/Container";
 import Reveal from "@/components/common/Reveal";
 import CourseCard from "@/components/course/CourseCard";
 import CourseSwiper from "@/components/course/CourseSwiper";
-import { COURSES } from "@/lib/site-data";
 import { useLanguage } from "@/components/layout/LanguageProvider";
+import { useCourses } from "@/lib/useCourses";
 
 export default function CoursesPreview() {
   const { t } = useLanguage();
-  const featured = COURSES.slice(0, 3);
+  const { ready, courses } = useCourses();
+  const featured = courses.slice(0, 3);
+
+  if (!ready) return null;
 
   return (
     <Container as="section" className="py-20">

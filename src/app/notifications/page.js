@@ -1,5 +1,4 @@
 import NotificationsListView from "@/components/notifications/NotificationsListView";
-import { NOTIFICATIONS } from "@/lib/site-data";
 
 export const metadata = {
   title: "Notifications | Insura",
@@ -7,5 +6,5 @@ export const metadata = {
 };
 
 export default function NotificationsPage() {
-  return <NotificationsListView notifications={NOTIFICATIONS} />;
+  return <NotificationsListView />;
 }

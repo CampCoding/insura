@@ -1,7 +1,9 @@
 import { Geist, Geist_Mono, EB_Garamond, Cairo } from "next/font/google";
 import SiteChrome from "@/components/layout/SiteChrome";
 import ThemeSync from "@/components/layout/ThemeSync";
+import QueryProvider from "@/components/layout/QueryProvider";
 import { LanguageProvider } from "@/components/layout/LanguageProvider";
+import { SettingsProvider } from "@/components/layout/SettingsProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,10 +50,14 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-full flex flex-col font-sans">
-        <LanguageProvider>
-          <ThemeSync />
-          <SiteChrome>{children}</SiteChrome>
-        </LanguageProvider>
+        <QueryProvider>
+          <LanguageProvider>
+            <SettingsProvider>
+              <ThemeSync />
+              <SiteChrome>{children}</SiteChrome>
+            </SettingsProvider>
+          </LanguageProvider>
+        </QueryProvider>
       </body>
     </html>
   );

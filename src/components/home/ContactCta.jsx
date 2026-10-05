@@ -5,9 +5,11 @@ import Container from "@/components/common/Container";
 import Reveal from "@/components/common/Reveal";
 import { buildWhatsAppLink } from "@/lib/site-data";
 import { useLanguage } from "@/components/layout/LanguageProvider";
+import { useSettings } from "@/components/layout/SettingsProvider";
 
 export default function ContactCta() {
   const { t } = useLanguage();
+  const { settings } = useSettings();
 
   return (
     <Container as="section" className="py-20">
@@ -22,7 +24,10 @@ export default function ContactCta() {
           )}
         </p>
         <Button
-          href={buildWhatsAppLink("Hi, I'd like to know more about the courses")}
+          href={buildWhatsAppLink(
+            "Hi, I'd like to know more about the courses",
+            settings.whatsappNumber
+          )}
           fillColor="#25D366"
         >
           {t("Chat on WhatsApp", "تواصل عبر واتساب")}

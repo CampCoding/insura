@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Check, ChevronDown, Lock, MonitorPlay } from "lucide-react";
 import { formatMinutes } from "@/lib/site-data";
-import { useEnrollment } from "@/lib/useEnrollment";
 import { useLanguage } from "@/components/layout/LanguageProvider";
 
 function sectionMinutes(section) {
@@ -41,24 +40,29 @@ export function LessonMarker({ state }) {
   );
 }
 
-export default function CourseCurriculum({ slug, curriculum }) {
+// Used two ways:
+// - Public course page: curriculum comes from read_course.php, each lesson
+//   carries its own server-computed `locked` flag, no `watched` data.
+// - Learn area: curriculum comes from read_progress.php instead, every
+//   lesson is unlocked (no `locked` field) and carries a real `watched` flag,
+//   so this renders done/current markers too.
+export default function CourseCurriculum({ slug, curriculum, isEnrolled = false }) {
   const { t, tf, lang } = useLanguage();
   const [openIndexes, setOpenIndexes] = useState(() => new Set([0]));
-  const { enrolled, completed } = useEnrollment(slug);
+
   const flatKeys = curriculum.flatMap((section, sectionIndex) =>
-    section.lessons.map((_, lessonIndex) => `${sectionIndex}-${lessonIndex}`)
+    section.lessons.map((lesson, lessonIndex) => ({
+      key: lesson.key ?? `${sectionIndex}-${lessonIndex}`,
+      done: Boolean(lesson.watched),
+    }))
   );
-  const currentKey = enrolled
-    ? flatKeys.find((key) => !completed.includes(key))
-    : null;
+  const currentKey = isEnrolled ? flatKeys.find((l) => !l.done)?.key : null;
 
   return (
     <div className="flex flex-col gap-3">
       {curriculum.map((section, sectionIndex) => {
         const isOpen = openIndexes.has(sectionIndex);
-        const sectionDone = section.lessons.filter((_, lessonIndex) =>
-          completed.includes(`${sectionIndex}-${lessonIndex}`)
-        ).length;
+        const sectionDone = section.lessons.filter((lesson) => lesson.watched).length;
         const toggleOpen = () =>
           setOpenIndexes((prev) => {
             const next = new Set(prev);
@@ -72,7 +76,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
 
         return (
           <div
-            key={tf(section.title)}
+            key={section.section_id ?? tf(section.title)}
             className="overflow-hidden rounded-card border border-border bg-surface"
           >
             <button
@@ -86,7 +90,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
               </span>
               <span className="flex shrink-0 items-center gap-3 text-sm text-muted-foreground">
                 <span>
-                  {enrolled
+                  {isEnrolled
                     ? t(
                         `${sectionDone}/${section.lessons.length} complete`,
                         `${sectionDone}/${section.lessons.length} مكتمل`
@@ -117,9 +121,9 @@ export default function CourseCurriculum({ slug, curriculum }) {
               <div className="overflow-hidden">
                 <ul className="flex flex-col divide-y divide-border px-6 py-1">
                   {section.lessons.map((lesson, lessonIndex) => {
-                    const key = `${sectionIndex}-${lessonIndex}`;
-                    const isDone = completed.includes(key);
-                    const unlocked = enrolled || lesson.preview;
+                    const key = lesson.key ?? `${sectionIndex}-${lessonIndex}`;
+                    const unlocked = !lesson.locked;
+                    const isDone = Boolean(lesson.watched);
                     const markerState = isDone
                       ? "done"
                       : !unlocked
@@ -145,7 +149,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
                           >
                             {lessonIndex + 1}- {tf(lesson.title)}
                           </span>
-                          {lesson.preview && !enrolled && (
+                          {lesson.preview && !isEnrolled && (
                             <span className="shrink-0 rounded-full bg-primary-tint px-2 py-0.5 text-xs font-medium text-primary">
                               {t("Preview", "معاينة")}
                             </span>
@@ -159,7 +163,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
 
                     if (unlocked) {
                       return (
-                        <li key={tf(lesson.title)}>
+                        <li key={key}>
                           <Link
                             href={`/learn/${slug}/${key}`}
                             className="flex items-center justify-between gap-4 rounded-lg px-1 py-3 transition-colors hover:bg-primary-tint"
@@ -172,7 +176,7 @@ export default function CourseCurriculum({ slug, curriculum }) {
 
                     return (
                       <li
-                        key={tf(lesson.title)}
+                        key={key}
                         className="flex items-center justify-between gap-4 px-1 py-3"
                       >
                         {row}

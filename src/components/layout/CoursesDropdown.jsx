@@ -1,18 +1,18 @@
 "use client";
 
-import { COURSES } from "@/lib/site-data";
 import { gsap } from "gsap";
 import { ChevronDown, Clock } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useCourses } from "@/lib/useCourses";
 import { useLanguage } from "./LanguageProvider";
-
-const PREVIEW_COURSES = COURSES.slice(0, 5);
 
 export default function CoursesDropdown() {
   const { t, tf } = useLanguage();
+  const { courses } = useCourses();
+  const previewCourses = courses.slice(0, 5);
   const pathname = usePathname();
   const isActive = pathname.startsWith("/courses");
   const [open, setOpen] = useState(false);
@@ -76,7 +76,7 @@ export default function CoursesDropdown() {
             style={{ top: coords.top, left: coords.left }}
             className="fixed z-50 w-80 rounded-2xl border border-border bg-background p-2 shadow-lg shadow-foreground/10"
           >
-            {PREVIEW_COURSES.map((course) => (
+            {previewCourses.map((course) => (
               <Link
                 key={course.slug}
                 href={`/courses/${course.slug}`}

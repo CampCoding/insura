@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ArrowLeft, Clock } from "lucide-react";
-import { unsplashUrl } from "@/lib/site-data";
 import { useLanguage } from "@/components/layout/LanguageProvider";
 
 export default function CourseCard({ course }) {
@@ -17,7 +16,7 @@ export default function CourseCard({ course }) {
     >
       <div className="relative aspect-video overflow-hidden">
         <Image
-          src={unsplashUrl(course.image, 640, 400)}
+          src={course.image}
           alt={tf(course.title)}
           fill
           sizes="(min-width: 768px) 320px, 100vw"

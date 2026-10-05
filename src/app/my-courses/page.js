@@ -1,50 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "@/components/common/Button";
 import Container from "@/components/common/Container";
-import {
-  getCourseBySlug,
-  getFlatLessons,
-  unsplashUrl,
-} from "@/lib/site-data";
-import {
-  ENROLLMENT_EVENT,
-  getCompletedLessons,
-  getEnrolledSlugs,
-} from "@/lib/enrollment";
 import { useLanguage } from "@/components/layout/LanguageProvider";
-
-function readEnrolledCourses() {
-  return getEnrolledSlugs()
-    .map((slug) => getCourseBySlug(slug))
-    .filter(Boolean)
-    .map((course) => {
-      const total = getFlatLessons(course).length;
-      const done = getCompletedLessons(course.slug).length;
-      return {
-        course,
-        progress: total ? Math.round((done / total) * 100) : 0,
-      };
-    });
-}
+import { useAuth } from "@/lib/useAuth";
+import { getMyCourses } from "@/lib/progress-api";
 
 export default function MyCoursesPage() {
   const { t, tf } = useLanguage();
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const { ready: authReady, isAuthenticated, session } = useAuth();
+  const studentId = session?.student_id;
+  const enabled = authReady && isAuthenticated;
 
-  useEffect(() => {
-    const sync = () => setEnrolledCourses(readEnrolledCourses());
-    sync();
-    window.addEventListener(ENROLLMENT_EVENT, sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.removeEventListener(ENROLLMENT_EVENT, sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, []);
+  const query = useQuery({
+    queryKey: ["my-courses", studentId],
+    queryFn: () => getMyCourses(studentId),
+    enabled,
+  });
+
+  const ready = enabled ? query.isFetched : authReady;
+  const courses = query.data ?? [];
+
+  if (!ready) return null;
+
+  if (!isAuthenticated) {
+    return (
+      <Container as="section" className="py-16">
+        <h1 className="text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
+          {t("My courses", "دوراتي")}
+        </h1>
+        <div className="mt-8 rounded-card border border-border bg-surface p-10 text-center">
+          <p className="text-base text-muted-foreground">
+            {t("Log in to see your enrolled courses.", "سجّل الدخول لرؤية دوراتك.")}
+          </p>
+          <Button href="/login" className="mt-5 w-fit">
+            {t("Log in", "تسجيل الدخول")}
+          </Button>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container as="section" className="py-16">
@@ -52,7 +50,7 @@ export default function MyCoursesPage() {
         {t("My courses", "دوراتي")}
       </h1>
 
-      {enrolledCourses.length === 0 ? (
+      {courses.length === 0 ? (
         <div className="mt-8 rounded-card border border-border bg-surface p-10 text-center">
           <p className="text-base text-muted-foreground">
             {t("You haven't enrolled in any course yet.", "لم تشترك في أي دورة بعد.")}
@@ -63,15 +61,15 @@ export default function MyCoursesPage() {
         </div>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {enrolledCourses.map(({ course, progress }) => (
+          {courses.map((course) => (
             <Link
-              key={course.slug}
+              key={course.enrollment_id}
               href={`/learn/${course.slug}`}
               className="group flex flex-col overflow-hidden rounded-card border border-border bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
             >
               <div className="relative aspect-video overflow-hidden">
                 <Image
-                  src={unsplashUrl(course.image, 640, 400)}
+                  src={course.image}
                   alt={tf(course.title)}
                   fill
                   sizes="(min-width: 768px) 320px, 100vw"
@@ -84,12 +82,12 @@ export default function MyCoursesPage() {
                 </h3>
                 <div className="mt-4">
                   <p className="text-xs font-medium text-muted-foreground">
-                    {t(`${progress}% complete`, `${progress}% مكتمل`)}
+                    {t(`${course.percent}% complete`, `${course.percent}% مكتمل`)}
                   </p>
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-primary-tint">
                     <div
                       className="h-full rounded-full bg-primary transition-all duration-500"
-                      style={{ width: `${progress}%` }}
+                      style={{ width: `${course.percent}%` }}
                     />
                   </div>
                 </div>

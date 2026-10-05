@@ -4,9 +4,19 @@ import Container from "@/components/common/Container";
 import CourseCard from "@/components/course/CourseCard";
 import Reveal from "@/components/common/Reveal";
 import { useLanguage } from "@/components/layout/LanguageProvider";
+import { useCourses } from "@/lib/useCourses";
 
-export default function CoursesListView({ courses }) {
+export default function CoursesListView() {
   const { t } = useLanguage();
+  const { ready, courses } = useCourses();
+
+  if (!ready) {
+    return (
+      <Container as="section" className="py-16">
+        <p className="text-sm text-muted-foreground">{t("Loading...", "جارٍ التحميل...")}</p>
+      </Container>
+    );
+  }
 
   return (
     <Container as="section" className="py-16">
